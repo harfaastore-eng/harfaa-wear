@@ -203,26 +203,35 @@ function placeOrder(){if(isOrdering)return;let name=document.getElementById('cus
 makeSnow();startCountdown();render();updateHero();setInterval(showToast,18000);setTimeout(showToast,5000);
 </script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
 const supabaseClient = window.supabase.createClient("https://uuxrjiytnnxsbhymkdfd.supabase.co","sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI");
 async function loadHarfaa(){
   const { data } = await supabaseClient.from('products').select('*').order('created_at',{ascending:false});
   if(!data || data.length==0) return;
   const box = document.getElementById('products') || document.getElementById('prodGrid') || document.querySelector('[id*="prod"]');
   if(!box) return;
-  box.innerHTML += data.map(p => {
+  data.sort((a,b)=>(b.featured?1:0)-(a.featured?1:0));
+  let html = data.map(p => {
     let img = p.image_url || p.image || '';
-    if(!img.startsWith('http')) img = 'https://via.placeholder.com/600x600/111/fff?text=HARFAA';
-    let sizes = Array.isArray(p.sizes) ? p.sizes.join(' - ') : (p.sizes || '');
+    if(!img.startsWith('http') && !img.startsWith('data:')) img = 'https://via.placeholder.com/600x600/111/fff?text=HARFAA';
+    let sizes = Array.isArray(p.sizes) ? p.sizes.join(' - ') : (p.sizes || 'S - M - L - XL');
+    let oldPrice = p.old_price ? `<s style="color:#888">${p.old_price} ج</s>` : '';
     return `<div style="background:#111;padding:15px;border-radius:15px;color:#fff">
-      <img src="${img}" style="width:100%;border-radius:10px">
+      ${p.featured?'<div style="background:#ffd700;color:#000;padding:4px 8px;border-radius:20px;display:inline-block;font-size:12px;font-weight:bold">⭐ مميز</div>':''}
+      <img src="${img}" style="width:100%;border-radius:10px;margin-top:8px">
       <h3>${p.name}</h3>
-      <p>${p.price} ج</p>
-      <p><b>المقاسات:</b> ${sizes}</p>
-      <p><b>التفاصيل:</b> ${p.details || ''}</p>
-      <p><b>الشحن:</b> ${p.shipping || ''}</p>
-      <p><b>الريفيوز:</b> ${p.reviews || ''}</p>
+      <p><b style="font-size:18px">${p.price} ج</b> ${oldPrice} <span style="color:#aaa;font-size:12px">${p.category||''}</span></p>
+      <p style="font-size:13px;color:#ccc">${p.details||''}</p>
+      <p style="font-size:13px"><b>المقاسات:</b> ${sizes}</p>
+      <p style="font-size:13px"><b>الشحن:</b> ${p.shipping||'شحن لكل المحافظات'}</p>
+      <p style="font-size:13px"><b>الريفيوز:</b> ${p.reviews||''}</p>
+      <p style="font-size:12px;color:#888">المخزون: ${p.stock||0}</p>
+      <button onclick="alert('تمت الاضافة للسلة: ${p.name}')" style="width:100%;padding:12px;border-radius:10px;background:#fff;font-weight:bold;cursor:pointer">اضف للسلة</button>
     </div>`;
   }).join('');
+  box.innerHTML += html;
 }
 loadHarfaa();
-      </script></body></html>
+</script>
+      </body></html>
