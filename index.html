@@ -202,36 +202,37 @@ function trackOrder(){let id=document.getElementById('trackInput').value.trim().
 function placeOrder(){if(isOrdering)return;let name=document.getElementById('custName').value.trim();let phone=document.getElementById('custPhone').value.trim();let addr=document.getElementById('custAddr').value.trim();let gov=document.getElementById('custGov').value;let valid=true;document.querySelectorAll('.err').forEach(e=>e.style.display='none');if(!name){document.getElementById('errName').style.display='block';valid=false;}if(!/^01[0-9]{9}$/.test(phone)){document.getElementById('errPhone').style.display='block';valid=false;}if(!addr){document.getElementById('errAddr').style.display='block';valid=false;}if(!valid)return;let pay=document.getElementById('payMethod').value;let needsProof=(pay==='Vodafone Cash'||pay==='InstaPay');if(needsProof&&!proofUploaded){alert('⚠️ لازم ترفع سكرين شوت');return;}isOrdering=true;document.getElementById('confirmBtn').textContent='Loading...';setTimeout(()=>{let db=getDB();let t=calcTotalsSimple();let itemsText=cart.map(i=>i.name+' x'+i.qty).join(' - ');let orderId='HW-'+Math.floor(1000+Math.random()*9000);let order={id:orderId,name:name,phone:phone,addr:addr+' - '+gov,total:t.total,status:needsProof?'Pending Payment':'New',items:itemsText,pay:pay,proof:needsProof?proofName:'',date:new Date().toLocaleDateString('ar-EG')};db.orders.push(order);cart.forEach(ci=>{let p=db.products.find(x=>x.id==ci.id);if(p)p.stock=Math.max(0,p.stock-ci.qty);});saveDB(db);let msg=`طلب جديد Harfaa 🔥\nرقم: ${orderId}\nالاسم: ${name}\nالموبايل: ${phone}\nالعنوان: ${addr} - ${gov}\nالمنتجات: ${itemsText}\nطريقة الدفع: ${pay}\n${needsProof?'✅ اثبات الدفع: '+proofName+' - راجع '+PAY_NUMBER:'الدفع عند الاستلام'}\nالاجمالي: ${t.total}ج`;window.open('https://wa.me/'+WHATS_NUMBER+'?text='+encodeURIComponent(msg));hideAllViews();document.getElementById('successView').style.display='block';document.getElementById('successContent').innerHTML=`<div style="text-align:center;padding:30px 16px"><div style="font-size:70px">✅</div><h2>Thank You! Order Confirmed</h2><p style="color:#aaa">We received your order and will contact you on WhatsApp to confirm.</p><div style="background:#161617;border-radius:14px;padding:14px;margin:14px 0;text-align:right"><b>رقم الطلب: ${orderId}</b><br>المنتجات: ${itemsText}<br>الاجمالي: ${t.total}ج<br>طريقة الدفع: ${pay}<br>حالة الدفع: ${needsProof?'Pending Payment ⏳':'Unpaid - الدفع عند الاستلام'}<br>التوصيل: 2-4 ايام</div><button class="btn" style="background:#25D366" onclick="window.open('https://wa.me/${WHATS_NUMBER}?text='+encodeURIComponent('عايز اتابع طلبي ${orderId}'))">Track on WhatsApp 💬</button><button class="btn2" onclick="openFeature('track')">Track Your Order 📦</button><button class="btn2" onclick="showHome()">Continue Shopping →</button></div>`;cart=[];proofUploaded=false;isOrdering=false;updateCartUI();render();window.scrollTo({top:0,behavior:'smooth'});},800);}
 makeSnow();startCountdown();render();updateHero();setInterval(showToast,18000);setTimeout(showToast,5000);
 </script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const supabaseClient = window.supabase.createClient("https://uuxrjiytnnxsbhymkdfd.supabase.co","sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI");
-async function loadHarfaa(){
-  const { data } = await supabaseClient.from('products').select('*').order('created_at',{ascending:false});
-  if(!data || data.length==0) return;
-  const box = document.getElementById('products') || document.getElementById('prodGrid') || document.querySelector('[id*="prod"]');
-  if(!box) return;
-  data.sort((a,b)=>(b.featured?1:0)-(a.featured?1:0));
-  let html = data.map(p => {
-    let img = p.image_url || p.image || '';
-    if(!img.startsWith('http') && !img.startsWith('data:')) img = 'https://via.placeholder.com/600x600/111/fff?text=HARFAA';
-    let sizes = Array.isArray(p.sizes) ? p.sizes.join(' - ') : (p.sizes || 'S - M - L - XL');
-    let oldPrice = p.old_price ? `<s style="color:#888">${p.old_price} ج</s>` : '';
-    return `<div style="background:#111;padding:15px;border-radius:15px;color:#fff">
-      ${p.featured?'<div style="background:#ffd700;color:#000;padding:4px 8px;border-radius:20px;display:inline-block;font-size:12px;font-weight:bold">⭐ مميز</div>':''}
-      <img src="${img}" style="width:100%;border-radius:10px;margin-top:8px">
-      <h3>${p.name}</h3>
-      <p><b style="font-size:18px">${p.price} ج</b> ${oldPrice} <span style="color:#aaa;font-size:12px">${p.category||''}</span></p>
-      <p style="font-size:13px;color:#ccc">${p.details||''}</p>
-      <p style="font-size:13px"><b>المقاسات:</b> ${sizes}</p>
-      <p style="font-size:13px"><b>الشحن:</b> ${p.shipping||'شحن لكل المحافظات'}</p>
-      <p style="font-size:13px"><b>الريفيوز:</b> ${p.reviews||''}</p>
-      <p style="font-size:12px;color:#888">المخزون: ${p.stock||0}</p>
-      <button onclick="alert('تمت الاضافة للسلة: ${p.name}')" style="width:100%;padding:12px;border-radius:10px;background:#fff;font-weight:bold;cursor:pointer">اضف للسلة</button>
-    </div>`;
-  }).join('');
-  box.innerHTML += html;
+<script>const SUPA_URL = "https://uxrjytnxbvhmkfd.supabase.co";
+const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1eHJqaXl0bm54c2JoeW1rZGZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1MjE5MjksImV4cCI6MjExMDA5NzkyOX0.c-ceSSiUR8wKOsM7NWo3tTJJ-22GwvPFLep047AgqFE";
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+async function loadSupabaseProducts(){
+  let { data, error } = await supa.from('products').select('*').order('created_at', {ascending:false});
+  if(error || !data) return;
+  let db = getDB();
+  data.forEach(p => {
+    let exists = db.products.find(x => String(x.id) === String(p.id));
+    if(!exists){
+      db.products.push({
+        id: p.id,
+        name: p.name,
+        price: Number(p.price),
+        img: p.image_url || p.image || p.img || '',
+        color: p.color || 'اسود',
+        cat: p.category || 'Tshirt',
+        stock: p.stock ?? 20,
+        desc: p.details || p.description || 'Premium oversized cotton tee',
+        bg: '#111111',
+        sizes: ['XL','2XL','3XL','4XL'],
+        isAI: false,
+        supa: true
+      });
+    }
+  });
+  saveDB(db);
+  render();
+  updateHero();
 }
-loadHarfaa();
+loadSupabaseProducts();
 </script>
       </body></html>
