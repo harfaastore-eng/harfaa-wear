@@ -113,7 +113,7 @@ function showTab(id){
   ['productsTab','siteTab','passTab'].forEach(x=>document.getElementById(x).classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
-  if(id==='productsTab')document.getElementById('t1').classList.add('active');
+  if(id==='productsTab')document.getElementById({'t1').classList.add('active');
   if(id==='siteTab')document.getElementById('t2').classList.add('active');
   if(id==='passTab')document.getElementById('t3').classList.add('active');
 }
@@ -126,9 +126,29 @@ function changePass(){
   document.getElementById('passMsg').innerText='✅ اتغير بنجاح! من دلوقتي هتدخل بيه';
   document.getElementById('oldPass').value='';document.getElementById('newPass').value='';document.getElementById('newPass2').value='';
 }
-async function loadAll(){
+let allCategories = [];
+async function loadCategories(){
+  const {data} = await sb.from('categories').select('*').order('name');
+  allCategories = data || [];
+  const sel = document.getElementById('f_cat');
+  if(sel){
+    sel.innerHTML = allCategories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('') + `<option value="__new__">+ قسم جديد...</option>`;
+  sel.onchange = function(){ if(this.value=='__new__') addNewCategory(); };
+    }
+  } 
+async function addNewCategory()
+  const name = prompt('اسم القسم الجديد:');
+  if(!name) return;
+  const slug = name.trim().toLowerCase().replace(/\s+/g,'-');
+  const {data, error} = await sb.from('categories').insert([{name: name.trim(), slug: slug}]).select().single();
+  if(error){ alert('مشكلة في إضافة القسم: ' + error.message); return; }
+  await loadCategories();
+  document.getElementById('f_cat').value = data.id;
+  alert('تم إضافة القسم ✅');
+}
+  async function loadAll(){
   const {data}=await sb.from('products').select('*').order('created_at',{ascending:false});
-  allProducts=data||[]; render(); loadSite();
+  allProducts=data||[]; render(); loadSite(); loadCategories();
 }
 function render(){
   let q=(document.getElementById('search').value||'').toLowerCase();
