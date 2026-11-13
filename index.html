@@ -201,4 +201,28 @@ function updateCheckoutSummary(){let t=calcTotalsSimple();let el=document.getEle
 function trackOrder(){let id=document.getElementById('trackInput').value.trim().toUpperCase();let phone=document.getElementById('trackPhone').value.trim();if(!id||!phone)return alert('اكتب رقم الطلب ورقم الموبايل');let db=getDB();let o=db.orders.find(x=>x.id.toUpperCase()===id&&x.phone===phone);let res=document.getElementById('trackResult');if(!o){res.innerHTML='<p style="color:#ff3b30">❌ مفيش طلب بالرقم ورقم الموبايل دول</p>';return;}res.innerHTML=`<div style="background:#0f0f0f;padding:12px;border-radius:12px;margin-top:10px"><b>${o.id}</b> - ${o.status}<br>${o.items} - ${o.total}ج</div>`;}
 function placeOrder(){if(isOrdering)return;let name=document.getElementById('custName').value.trim();let phone=document.getElementById('custPhone').value.trim();let addr=document.getElementById('custAddr').value.trim();let gov=document.getElementById('custGov').value;let valid=true;document.querySelectorAll('.err').forEach(e=>e.style.display='none');if(!name){document.getElementById('errName').style.display='block';valid=false;}if(!/^01[0-9]{9}$/.test(phone)){document.getElementById('errPhone').style.display='block';valid=false;}if(!addr){document.getElementById('errAddr').style.display='block';valid=false;}if(!valid)return;let pay=document.getElementById('payMethod').value;let needsProof=(pay==='Vodafone Cash'||pay==='InstaPay');if(needsProof&&!proofUploaded){alert('⚠️ لازم ترفع سكرين شوت');return;}isOrdering=true;document.getElementById('confirmBtn').textContent='Loading...';setTimeout(()=>{let db=getDB();let t=calcTotalsSimple();let itemsText=cart.map(i=>i.name+' x'+i.qty).join(' - ');let orderId='HW-'+Math.floor(1000+Math.random()*9000);let order={id:orderId,name:name,phone:phone,addr:addr+' - '+gov,total:t.total,status:needsProof?'Pending Payment':'New',items:itemsText,pay:pay,proof:needsProof?proofName:'',date:new Date().toLocaleDateString('ar-EG')};db.orders.push(order);cart.forEach(ci=>{let p=db.products.find(x=>x.id==ci.id);if(p)p.stock=Math.max(0,p.stock-ci.qty);});saveDB(db);let msg=`طلب جديد Harfaa 🔥\nرقم: ${orderId}\nالاسم: ${name}\nالموبايل: ${phone}\nالعنوان: ${addr} - ${gov}\nالمنتجات: ${itemsText}\nطريقة الدفع: ${pay}\n${needsProof?'✅ اثبات الدفع: '+proofName+' - راجع '+PAY_NUMBER:'الدفع عند الاستلام'}\nالاجمالي: ${t.total}ج`;window.open('https://wa.me/'+WHATS_NUMBER+'?text='+encodeURIComponent(msg));hideAllViews();document.getElementById('successView').style.display='block';document.getElementById('successContent').innerHTML=`<div style="text-align:center;padding:30px 16px"><div style="font-size:70px">✅</div><h2>Thank You! Order Confirmed</h2><p style="color:#aaa">We received your order and will contact you on WhatsApp to confirm.</p><div style="background:#161617;border-radius:14px;padding:14px;margin:14px 0;text-align:right"><b>رقم الطلب: ${orderId}</b><br>المنتجات: ${itemsText}<br>الاجمالي: ${t.total}ج<br>طريقة الدفع: ${pay}<br>حالة الدفع: ${needsProof?'Pending Payment ⏳':'Unpaid - الدفع عند الاستلام'}<br>التوصيل: 2-4 ايام</div><button class="btn" style="background:#25D366" onclick="window.open('https://wa.me/${WHATS_NUMBER}?text='+encodeURIComponent('عايز اتابع طلبي ${orderId}'))">Track on WhatsApp 💬</button><button class="btn2" onclick="openFeature('track')">Track Your Order 📦</button><button class="btn2" onclick="showHome()">Continue Shopping →</button></div>`;cart=[];proofUploaded=false;isOrdering=false;updateCartUI();render();window.scrollTo({top:0,behavior:'smooth'});},800);}
 makeSnow();startCountdown();render();updateHero();setInterval(showToast,18000);setTimeout(showToast,5000);
-</script></body></html>
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const supabaseClient = window.supabase.createClient("https://uuxrjiytnnxsbhymkdfd.supabase.co","sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI");
+async function loadHarfaa(){
+  const { data } = await supabaseClient.from('products').select('*').order('created_at',{ascending:false});
+  if(!data || data.length==0) return;
+  const box = document.getElementById('products') || document.getElementById('prodGrid') || document.querySelector('[id*="prod"]');
+  if(!box) return;
+  box.innerHTML = data.map(p => {
+    let img = p.image_url || p.image || '';
+    if(!img.startsWith('http')) img = 'https://via.placeholder.com/600x600/111/fff?text=HARFAA';
+    let sizes = Array.isArray(p.sizes) ? p.sizes.join(' - ') : (p.sizes || '');
+    return `<div style="background:#111;padding:15px;border-radius:15px;color:#fff">
+      <img src="${img}" style="width:100%;border-radius:10px">
+      <h3>${p.name}</h3>
+      <p>${p.price} ج</p>
+      <p><b>المقاسات:</b> ${sizes}</p>
+      <p><b>التفاصيل:</b> ${p.details || ''}</p>
+      <p><b>الشحن:</b> ${p.shipping || ''}</p>
+      <p><b>الريفيوز:</b> ${p.reviews || ''}</p>
+    </div>`;
+  }).join('');
+}
+loadHarfaa();
+      </script></body></html>
