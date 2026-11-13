@@ -195,4 +195,30 @@ function toggleAI(){let p=document.getElementById('aiPanel');p.style.display=p.s
 setInterval(()=>{let el=document.getElementById('countdown');if(el)el.textContent='01 : 23 : 45 : 10';},1000);
 render(); updateHero();
 </script>
-</body></html>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://uuxrjiytnnxsbhymkdfd.supabase.co";
+const SUPABASE_KEY = "sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// تحميل المنتجات لكل الناس من Supabase
+async function loadProducts() {
+  const { data, error } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
+  if (error) { console.log(error); return []; }
+  return data || [];
+}
+
+// حفظ منتج جديد من الادمن
+async function saveProductToSupabase(product) {
+  const { data, error } = await supabaseClient.from('products').insert([{
+    name: product.name,
+    price: product.price,
+    old_price: product.old_price || null,
+    image: product.image,
+    category: product.category || 'all',
+    sizes: (product.sizes || []).join(',')
+  }]).select();
+  if (error) { alert('في مشكلة في الحفظ: ' + error.message); return null; }
+  return data[0];
+}
+</script></body></html>
