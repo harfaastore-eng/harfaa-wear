@@ -35,6 +35,7 @@ label{font-size:13px;color:#aaa}
 <button id="t1" class="active" onclick="showTab('productsTab')">📦 المنتجات</button>
 <button id="t2" onclick="showTab('siteTab')">🎨 شكل الموقع</button>
 <button id="t3" onclick="showTab('passTab')">🔐 الباسورد</button>
+  <button id="t4" onclick="showTab('ordersTab')">📦 الطلبات</button>
 </div>
 
 <!-- STATS -->
@@ -67,6 +68,13 @@ label{font-size:13px;color:#aaa}
 <div class="card"><input id="search" placeholder="🔍 ابحث في المنتجات..." oninput="render()"><div id="list"></div></div>
 </div>
 
+<!-- ORDERS TAB -->
+<div id="ordersTab" class="hidden">
+<div class="card"><h3>📦 الطلبات</h3>
+<button class="btn" onclick="loadOrders()">🔄 تحديث الطلبات</button>
+<div id="ordersList" style="margin-top:12px">جارى التحميل...</div>
+</div>
+</div>
 <!-- SITE TAB -->
 <div id="siteTab" class="hidden">
 <div class="card"><h3>🎨 شكل الموقع كله من هنا</h3>
@@ -110,12 +118,13 @@ function login(){
 if(localStorage.getItem('harfaa_admin_login')==='yes'){document.getElementById('loginBox').classList.add('hidden');document.getElementById('adminBox').classList.remove('hidden');loadAll();}
 function logout(){localStorage.removeItem('harfaa_admin_login');location.reload()}
 function showTab(id){
-  ['productsTab','siteTab','passTab'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+  ['productsTab','siteTab','passTab','ordersTab'].forEach(x=>document.getElementById(x).classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
   if(id==='productsTab')document.getElementById('t1').classList.add('active');
   if(id==='siteTab')document.getElementById('t2').classList.add('active');
   if(id==='passTab')document.getElementById('t3').classList.add('active');
+  if(id==='ordersTab')document.getElementById('t4').classList.add('active');
 }
 function changePass(){
   let o=document.getElementById('oldPass').value,n=document.getElementById('newPass').value,n2=document.getElementById('newPass2').value;
@@ -148,8 +157,26 @@ async function addNewCategory(){
 }
 async function loadAll(){
   const {data}=await sb.from('products').select('*').order('created_at',{ascending:false});
-  allProducts=data||[]; render(); loadSite(); loadCategories();
+     allProducts=data||[]; render(); loadSite(); loadCategories(); loadOrders();
 }
+async function loadOrders(){
+  const {data, error} = await sb.from('harfas_orders').select('*').order('created_at',{ascending:false});
+  if(error){document.getElementById('ordersList').innerHTML='❌ خطأ: '+error.message; return;}
+  if(!data || data.length===0){document.getElementById('ordersList').innerHTML='<p>مفيش طلبات لسه</p>'; return;}
+  document.getElementById('ordersList').innerHTML = data.map(o=>`
+  <div class="prod" style="margin-bottom:10px">
+  <b>${o.code||''} - ${o.name||''}</b><br>
+  📞 ${o.phone||''} | 📍 ${o.gov||''} - ${o.addr||''}<br>
+  🛒 ${o.items||''}<br>
+  💰 الاجمالي: ${o.total||''} ج | الدفع: ${o.pay||''} | الحالة: ${o.status||'new'}<br>
+  <small>${o.created_at||''}</small><br>
+  <div class="flex" style="margin-top:8px">
+  <button class="btn3" onclick="updateOrderStatus('${o.id}','done')">✅ تم</button>
+  <button class="btn2" onclick="delOrder('${o.id}')">حذف</button>
+  </div></div>`).join('');
+}
+async function updateOrderStatus(id,st){ await sb.from('harfas_orders').update({status:st}).eq('id',id); loadOrders(); }
+async function delOrder(id){ if(!confirm('تحذف الطلب ده؟'))return; await sb.from('harfas_orders').delete().eq('id',id); loadOrders(); }}
 function render(){
   let q=(document.getElementById('search').value||'').toLowerCase();
   let filtered=allProducts.filter(p=>(p.name||'').toLowerCase().includes(q));
