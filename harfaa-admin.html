@@ -98,7 +98,7 @@ label{font-size:13px;color:#aaa}
 <script>
 const sb = window.supabase.createClient("https://uuxrjiytnnxsbhymkdfd.supabase.co","sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI");
 let allProducts=[];
-function getPass(){return 'hatememadhatememad2006'}
+function getPass(){ return localStorage.getItem('harfaa_admin_pass') || 'hatememadhatememad2006'; }
 function login(){
   if(document.getElementById('passInput').value===getPass()){
     localStorage.setItem('harfaa_admin_login','yes');
@@ -113,7 +113,7 @@ function showTab(id){
   ['productsTab','siteTab','passTab'].forEach(x=>document.getElementById(x).classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
-  if(id==='productsTab')document.getElementById({'t1').classList.add('active');
+  if(id==='productsTab')document.getElementById('t1').classList.add('active');
   if(id==='siteTab')document.getElementById('t2').classList.add('active');
   if(id==='passTab')document.getElementById('t3').classList.add('active');
 }
@@ -133,10 +133,10 @@ async function loadCategories(){
   const sel = document.getElementById('f_cat');
   if(sel){
     sel.innerHTML = allCategories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('') + `<option value="__new__">+ قسم جديد...</option>`;
-  sel.onchange = function(){ if(this.value=='__new__') addNewCategory(); };
-    }
-  } 
-async function addNewCategory()
+    sel.onchange = function(){ if(this.value=='__new__') addNewCategory(); };
+  }
+}
+async function addNewCategory(){
   const name = prompt('اسم القسم الجديد:');
   if(!name) return;
   const slug = name.trim().toLowerCase().replace(/\s+/g,'-');
@@ -146,7 +146,7 @@ async function addNewCategory()
   document.getElementById('f_cat').value = data.id;
   alert('تم إضافة القسم ✅');
 }
-  async function loadAll(){
+async function loadAll(){
   const {data}=await sb.from('products').select('*').order('created_at',{ascending:false});
   allProducts=data||[]; render(); loadSite(); loadCategories();
 }
