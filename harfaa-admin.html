@@ -1,130 +1,186 @@
-here<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Harfaa Admin</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HARFAA - لوحة تحكم احترافية</title>
 <style>
-body{font-family:sans-serif;background:#111;color:#fff;padding:20px;max-width:800px;margin:auto}
-input,textarea{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #333;background:#222;color:#fff;box-sizing:border-box}
-button{background:#fff;color:#000;padding:12px 20px;border:none;border-radius:10px;font-weight:bold;cursor:pointer;width:100%;margin-top:10px}
-.card{background:#1c1c1c;padding:15px;border-radius:12px;margin:10px 0}
-img{width:100%;border-radius:10px}
-.hidden{display:none}
+*{box-sizing:border-box;font-family:system-ui}body{margin:0;background:#0a0a0a;color:#fff;padding:15px}
+h1{text-align:center} .card{background:#151515;border:1px solid #2a2a2a;border-radius:16px;padding:16px;margin-bottom:15px}
+input,textarea,select{width:100%;padding:12px;margin:6px 0;background:#222;border:1px solid #333;color:#fff;border-radius:10px}
+button{padding:12px 18px;border:0;border-radius:10px;font-weight:800;cursor:pointer}
+.btn{background:#fff;color:#000;width:100%} .btn2{background:#ff3b30;color:#fff} .btn3{background:#2e7d32;color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px} .prod{background:#1e1e1e;border-radius:14px;padding:12px}
+.prod img{width:100%;border-radius:10px;height:180px;object-fit:cover}
+.tabs{display:flex;gap:8px;margin-bottom:12px} .tabs button{flex:1;background:#222;color:#fff}
+.tabs button.active{background:#fff;color:#000}
+.stat{background:#1e1e1e;padding:14px;border-radius:12px;text-align:center}
+.hidden{display:none} .flex{display:flex;gap:8px} .flex button{flex:1}
 label{font-size:13px;color:#aaa}
-.size-box label{margin-left:12px;color:#fff;font-size:15px}
-.size-box input{width:auto}
 </style>
 </head>
 <body>
+<h1>👑 HARFAA ADMIN</h1>
 
-<div id="login">
-<h2>دخول الادمن - Harfaa</h2>
-<input id="email" placeholder="الايميل" value="admin@harfaa.com">
-<input id="pass" type="password" placeholder="الباسورد" value="harfaa12345">
-<button onclick="login()">دخول</button>
-<p id="err" style="color:red"></p>
+<!-- LOGIN -->
+<div id="loginBox" class="card">
+<h2>دخول الادمن</h2>
+<input type="password" id="passInput" placeholder="اكتب باسورد الادمن">
+<button class="btn" onclick="login()">دخول</button>
+<p style="color:#888;font-size:13px">الباسورد الافتراضي اول مرة: <b style="color:#fff">harfaa123</b></p>
 </div>
 
-<div id="panel" class="hidden">
-<h2>لوحة تحكم Harfaa 👕</h2>
-<button onclick="logout()" style="background:#333;color:#fff">خروج</button>
-
-<h3>اضافة منتج جديد</h3>
-<input id="p_name" placeholder="اسم المنتج - مثال: هودي أوفر سايز">
-<input id="p_price" type="number" placeholder="السعر - مثال: 850">
-<input id="p_old" type="number" placeholder="السعر قبل الخصم (اختياري)">
-<input id="p_image" placeholder="لينك صورة المنتج">
-
-<label>المقاسات</label>
-<div class="size-box">
-<label><input type="checkbox" value="S" class="size"> S</label>
-<label><input type="checkbox" value="M" class="size"> M</label>
-<label><input type="checkbox" value="L" class="size"> L</label>
-<label><input type="checkbox" value="XL" class="size"> XL</label>
-<label><input type="checkbox" value="2XL" class="size"> 2XL</label>
+<div id="adminBox" class="hidden">
+<div class="tabs">
+<button id="t1" class="active" onclick="showTab('productsTab')">📦 المنتجات</button>
+<button id="t2" onclick="showTab('siteTab')">🎨 شكل الموقع</button>
+<button id="t3" onclick="showTab('passTab')">🔐 الباسورد</button>
 </div>
 
-<label>تفاصيل المنتج</label>
-<textarea id="p_details" rows="4" placeholder="الخامة، القصّة، الطباعة..."></textarea>
+<!-- STATS -->
+<div class="grid" style="grid-template-columns:1fr 1fr 1fr">
+<div class="stat"><div id="stCount">0</div><small>منتج</small></div>
+<div class="stat"><div id="stAvg">0</div><small>متوسط السعر</small></div>
+<div class="stat"><div id="stNew">-</div><small>اخر منتج</small></div>
+</div>
 
-<label>معلومات الشحن</label>
-<textarea id="p_shipping" rows="3" placeholder="مثال: شحن لكل المحافظات خلال 2-4 ايام، شحن مجاني فوق 1500ج"></textarea>
-
-<label>الريفيوز - كل ريفيو في سطر: الاسم | التعليق | التقييم</label>
-<textarea id="p_reviews" rows="3" placeholder="احمد | خامة تحفة | 5
-سارة | المقاس مظبوط | 5"></textarea>
-
-<button onclick="save()">حفظ المنتج ✅</button>
+<!-- PRODUCTS TAB -->
+<div id="productsTab">
+<div class="card">
+<h3 id="formTitle">➕ اضافة منتج جديد</h3>
+<input type="hidden" id="editId">
+<label>اسم المنتج *</label><input id="f_name" placeholder="مثال: تيشيرت اوفرسايز اسود">
+<div class="grid"><div><label>السعر *</label><input id="f_price" type="number" placeholder="450"></div><div><label>السعر قبل الخصم</label><input id="f_old" type="number" placeholder="600"></div></div>
+<label>صورة المنتج - لينك</label><input id="f_image" placeholder="https://...">
+<label>او ارفع صورة من جهازك</label><input type="file" id="f_file" accept="image/*">
+<img id="preview" style="width:100%;border-radius:10px;display:none">
+<label>القسم</label><select id="f_cat"><option>تيشيرتات</option><option>هوديز</option><option>بناطيل</option><option>اكسسوارات</option><option>عروض</option></select>
+<label>المقاسات - افصل ب -</label><input id="f_sizes" value="S - M - L - XL - 2XL - 3XL">
+<label>المخزون</label><input id="f_stock" type="number" value="20">
+<label>التفاصيل</label><textarea id="f_details" placeholder="خامة قطن 100% ..."></textarea>
+<label>الشحن</label><textarea id="f_shipping" placeholder="شحن لكل المحافظات خلال 2-4 ايام"></textarea>
+<label>الريفيوز</label><textarea id="f_reviews" placeholder="تقييم العملاء ..."></textarea>
+<label><input type="checkbox" id="f_featured" style="width:auto"> ⭐ منتج مميز يظهر اول واحد</label>
+<div class="flex"><button class="btn" onclick="saveProduct()">💾 حفظ المنتج</button><button class="btn2" onclick="resetForm()">الغاء</button></div>
 <p id="msg"></p>
-
-<h3>المنتجات الحالية</h3>
-<div id="list"></div>
+</div>
+<div class="card"><input id="search" placeholder="🔍 ابحث في المنتجات..." oninput="render()"><div id="list"></div></div>
 </div>
 
+<!-- SITE TAB -->
+<div id="siteTab" class="hidden">
+<div class="card"><h3>🎨 شكل الموقع كله من هنا</h3>
+<label>اسم الموقع</label><input id="s_name" value="Harfaa Wear">
+<label>نص البانر اللي فوق</label><input id="s_banner" value="🔥 عرض البندل: اشتري 2 وخد التالت بنص الثمن!">
+<label>لون الموقع الاساسي</label><input id="s_color" type="color" value="#ffffff">
+<label>رقم الواتساب للطلبات</label><input id="s_whats" placeholder="01000000000">
+<label>لينك الانستجرام</label><input id="s_insta" placeholder="https://instagram.com/...">
+<label>لينك التيك توك</label><input id="s_tiktok" placeholder="https://tiktok.com/...">
+<label>رسالة اسفل الموقع</label><input id="s_footer" value="HARFAA - لبس يعبر عنك">
+<button class="btn3" onclick="saveSite()">💾 حفظ شكل الموقع</button><p id="siteMsg"></p>
+<p style="color:#888;font-size:12px">الاعدادات دي بتتحفظ وبتتطبق على الموقع الرئيسي اوتوماتيك.</p>
+</div>
+</div>
+
+<!-- PASS TAB -->
+<div id="passTab" class="hidden">
+<div class="card"><h3>🔐 تغيير باسورد الادمن</h3>
+<label>الباسورد القديم</label><input type="password" id="oldPass" placeholder="الباسورد الحالي">
+<label>الباسورد الجديد</label><input type="password" id="newPass" placeholder="باسورد جديد قوي">
+<label>تأكيد الباسورد الجديد</label><input type="password" id="newPass2" placeholder="اكتبه تاني">
+<button class="btn" onclick="changePass()">تغيير الباسورد</button><p id="passMsg"></p>
+<button class="btn2" onclick="logout()">🚪 تسجيل خروج</button>
+</div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = "https://uuxrjiytnnxsbhymkdfd.supabase.co";
-const SUPABASE_KEY = "sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+const sb = window.supabase.createClient("https://uuxrjiytnnxsbhymkdfd.supabase.co","sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI");
+let allProducts=[];
+function getPass(){return localStorage.getItem('harfaa_admin_pass')||'harfaa123'}
 function login(){
-  const e = document.getElementById('email').value.trim();
-  const p = document.getElementById('pass').value;
-  if(e === 'admin@harfaa.com' && p === 'harfaa12345'){
-    localStorage.setItem('harfaa_admin','1');
-    show();
-  } else {
-    document.getElementById('err').innerText = 'الايميل او الباسورد غلط';
-  }
+  if(document.getElementById('passInput').value===getPass()){
+    localStorage.setItem('harfaa_admin_login','yes');
+    document.getElementById('loginBox').classList.add('hidden');
+    document.getElementById('adminBox').classList.remove('hidden');
+    loadAll();
+  } else alert('الباسورد غلط!');
 }
-function logout(){ localStorage.removeItem('harfaa_admin'); location.reload(); }
-function show(){
-  document.getElementById('login').classList.add('hidden');
-  document.getElementById('panel').classList.remove('hidden');
-  load();
+if(localStorage.getItem('harfaa_admin_login')==='yes'){document.getElementById('loginBox').classList.add('hidden');document.getElementById('adminBox').classList.remove('hidden');loadAll();}
+function logout(){localStorage.removeItem('harfaa_admin_login');location.reload()}
+function showTab(id){
+  ['productsTab','siteTab','passTab'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+  if(id==='productsTab')document.getElementById('t1').classList.add('active');
+  if(id==='siteTab')document.getElementById('t2').classList.add('active');
+  if(id==='passTab')document.getElementById('t3').classList.add('active');
 }
-if(localStorage.getItem('harfaa_admin')) show();
-
-async function save(){
-  const sizes = [...document.querySelectorAll('.size:checked')].map(x=>x.value);
-  const reviewsText = document.getElementById('p_reviews').value.trim();
-  const reviews = reviewsText ? reviewsText.split('\n').map(l=>{
-    const parts = l.split('|');
-    return {name: parts[0]?.trim(), comment: parts[1]?.trim(), rating: parseInt(parts[2])||5};
-  }) : [];
-  const data = {
-    name: document.getElementById('p_name').value,
-    price: parseFloat(document.getElementById('p_price').value),
-    old_price: parseFloat(document.getElementById('p_old').value) || null,
-    image: document.getElementById('p_image').value,
-    sizes: sizes,
-    details: document.getElementById('p_details').value,
-    shipping: document.getElementById('p_shipping').value,
-    reviews: reviews
-  };
-  const {error} = await supabaseClient.from('products').insert(data);
-  document.getElementById('msg').innerText = error ? 'خطأ: '+error.message : 'تم الحفظ ✅ وظهر في الموقع';
-  if(!error) load();
+function changePass(){
+  let o=document.getElementById('oldPass').value,n=document.getElementById('newPass').value,n2=document.getElementById('newPass2').value;
+  if(o!==getPass()){document.getElementById('passMsg').innerText='❌ الباسورد القديم غلط';return}
+  if(n.length<4){document.getElementById('passMsg').innerText='❌ الباسورد الجديد لازم 4 حروف على الاقل';return}
+  if(n!==n2){document.getElementById('passMsg').innerText='❌ التأكيد مش مطابق';return}
+  localStorage.setItem('harfaa_admin_pass',n);
+  document.getElementById('passMsg').innerText='✅ اتغير بنجاح! من دلوقتي هتدخل بيه';
+  document.getElementById('oldPass').value='';document.getElementById('newPass').value='';document.getElementById('newPass2').value='';
 }
-
-async function load(){
-  const {data} = await supabaseClient.from('products').select('*').order('created_at',{ascending:false});
-  const list = document.getElementById('list');
-  list.innerHTML = '';
-  (data||[]).forEach(p=>{
-    list.innerHTML += `<div class="card">
-      ${p.image?`<img src="${p.image}">`:''}
-      <h3>${p.name} - ${p.price}ج</h3>
-      <p>مقاسات: ${(p.sizes||[]).join(' - ')}</p>
-      <p>${p.details||''}</p>
-      <p>شحن: ${p.shipping||''}</p>
-      <p>ريفيوز: ${(p.reviews||[]).length}</p>
-      <button onclick="del('${p.id}')" style="background:#ff4444;color:#fff">حذف</button>
-    </div>`;
-  });
+async function loadAll(){
+  const {data}=await sb.from('products').select('*').order('created_at',{ascending:false});
+  allProducts=data||[]; render(); loadSite();
 }
-async function del(id){ await supabaseClient.from('products').delete().eq('id',id); load(); }
+function render(){
+  let q=(document.getElementById('search').value||'').toLowerCase();
+  let filtered=allProducts.filter(p=>(p.name||'').toLowerCase().includes(q));
+  document.getElementById('stCount').innerText=allProducts.length;
+  document.getElementById('stAvg').innerText=allProducts.length?Math.round(allProducts.reduce((a,p)=>a+(Number(p.price)||0),0)/allProducts.length)+' ج':'0';
+  document.getElementById('stNew').innerText=allProducts[0]?.name||'-';
+  document.getElementById('list').innerHTML=filtered.map(p=>`
+  <div class="prod"><img src="${p.image_url||'https://via.placeholder.com/600x600/111/fff?text=HARFAA'}">
+  <b>${p.name}</b><br>${p.price} ج ${p.old_price?' | <s>'+p.old_price+' ج</s>':''} | ${p.category||''} | مخزون: ${p.stock||0} ${p.featured?'⭐':''}
+  <div class="flex" style="margin-top:8px"><button class="btn3" onclick="editProduct('${p.id}')">تعديل</button><button class="btn2" onclick="delProduct('${p.id}')">حذف</button></div></div>`).join('')||'<p>مفيش منتجات</p>';
+}
+function editProduct(id){
+  let p=allProducts.find(x=>String(x.id)===String(id)); if(!p)return;
+  document.getElementById('formTitle').innerText='✏️ تعديل: '+p.name;
+  document.getElementById('editId').value=p.id;
+  document.getElementById('f_name').value=p.name||'';
+  document.getElementById('f_price').value=p.price||'';
+  document.getElementById('f_old').value=p.old_price||'';
+  document.getElementById('f_image').value=p.image_url||'';
+  document.getElementById('f_cat').value=p.category||'تيشيرتات';
+  document.getElementById('f_sizes').value=Array.isArray(p.sizes)?p.sizes.join(' - '):(p.sizes||'');
+  document.getElementById('f_stock').value=p.stock||20;
+  document.getElementById('f_details').value=p.details||'';
+  document.getElementById('f_shipping').value=p.shipping||'';
+  document.getElementById('f_reviews').value=p.reviews||'';
+  document.getElementById('f_featured').checked=!!p.featured;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function resetForm(){document.getElementById('editId').value='';document.getElementById('formTitle').innerText='➕ اضافة منتج جديد';['f_name','f_price','f_old','f_image','f_details','f_shipping','f_reviews'].forEach(i=>document.getElementById(i).value='');document.getElementById('f_stock').value=20;document.getElementById('f_sizes').value='S - M - L - XL - 2XL - 3XL';document.getElementById('f_featured').checked=false;document.getElementById('preview').style.display='none'}
+document.getElementById('f_file').addEventListener('change',e=>{
+  let f=e.target.files[0]; if(!f)return; let r=new FileReader(); r.onload=ev=>{document.getElementById('f_image').value=ev.target.result; let pr=document.getElementById('preview'); pr.src=ev.target.result; pr.style.display='block';}; r.readAsDataURL(f);
+});
+async function saveProduct(){
+  let name=document.getElementById('f_name').value.trim(); let price=Number(document.getElementById('f_price').value);
+  if(!name||!price){document.getElementById('msg').innerText='❌ اكتب الاسم والسعر';return}
+  document.getElementById('msg').innerText='جارى الحفظ...';
+  let obj={name,price,old_price:Number(document.getElementById('f_old').value)||null,image_url:document.getElementById('f_image').value||null,category:document.getElementById('f_cat').value,sizes:document.getElementById('f_sizes').value.split('-').map(s=>s.trim()).filter(Boolean),stock:Number(document.getElementById('f_stock').value)||0,details:document.getElementById('f_details').value,shipping:document.getElementById('f_shipping').value,reviews:document.getElementById('f_reviews').value,featured:document.getElementById('f_featured').checked};
+  let id=document.getElementById('editId').value; let res;
+  if(id) res=await sb.from('products').update(obj).eq('id',id); else res=await sb.from('products').insert([obj]);
+  if(res.error){document.getElementById('msg').innerText='❌ خطأ: '+res.error.message;return}
+  document.getElementById('msg').innerText='✅ اتحفظ بنجاح!'; resetForm(); loadAll();
+}
+async function delProduct(id){if(!confirm('متأكد تحذف المنتج ده؟'))return; await sb.from('products').delete().eq('id',id); loadAll();}
+function saveSite(){
+  let s={name:document.getElementById('s_name').value,banner:document.getElementById('s_banner').value,color:document.getElementById('s_color').value,whats:document.getElementById('s_whats').value,insta:document.getElementById('s_insta').value,tiktok:document.getElementById('s_tiktok').value,footer:document.getElementById('s_footer').value};
+  localStorage.setItem('harfaa_site_settings',JSON.stringify(s));
+  document.getElementById('siteMsg').innerText='✅ اتحفظ وهيتطبق على الموقع';
+}
+function loadSite(){
+  try{let s=JSON.parse(localStorage.getItem('harfaa_site_settings')||'{}'); if(s.name)document.getElementById('s_name').value=s.name; if(s.banner)document.getElementById('s_banner').value=s.banner; if(s.color)document.getElementById('s_color').value=s.color; if(s.whats)document.getElementById('s_whats').value=s.whats; if(s.insta)document.getElementById('s_insta').value=s.insta; if(s.tiktok)document.getElementById('s_tiktok').value=s.tiktok; if(s.footer)document.getElementById('s_footer').value=s.footer;}catch(e){}
+}
 </script>
 </body>
 </html>
