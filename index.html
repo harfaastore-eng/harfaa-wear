@@ -105,32 +105,60 @@ function isFeatureOn(key){
 }
 
 function applyHarfaaSettings(){
-  // 1. اخفي المميزات المقفولة من القايمة الجانبية
+  // 1. المميزات من القايمة
   document.querySelectorAll('#menuList .sideItem').forEach(item=>{
     const onclick = item.getAttribute('onclick')||'';
     const m = onclick.match(/openFeature\('([^']+)'\)/);
     if(m && !isFeatureOn(m[1])) item.style.display='none';
     else item.style.display='';
   });
-  // 2. التلج
   const snowEls = document.querySelectorAll('.snow, #snow, [class*="snow"]');
   if(HARFAA_FEATURES['snow']===false) snowEls.forEach(e=>e.style.display='none');
-  // 3. عرض البندل
   if(HARFAA_FEATURES['bundle']===false){
     document.querySelectorAll('*').forEach(el=>{
       if(el.textContent && el.textContent.includes('اشتري 2 وخد التالت')) el.style.display='none';
     });
   }
-  // 4. اعدادات الموقع
-  if(HARFAA_SITE.banner){
-    document.querySelectorAll('*').forEach(el=>{
-      if(el.children.length===0 && el.textContent.includes('اشتري 2')) el.textContent = HARFAA_SITE.banner;
-    });
+
+  // 2. اعدادات الموقع - دي اللي كانت ناقصة
+  const S = HARFAA_SITE || {};
+  // S دي فيها اللي الادمن بيحفظه: banner, shipping, free_shipping, whatsapp, vodafone, instapay
+  const freeLimit = parseInt(S.free_shipping || S.freeShipping || S.free || 0);
+  const shipCairo = parseInt(S.shipping_cairo || S.shipping || S.cairo || 0);
+  const shipOther = parseInt(S.shipping_other || S.shipping2 || 0);
+
+  // خزنهم في متغير عام عشان صفحة الدفع تستخدمهم
+  if(freeLimit) window.HARFAA_FREE_LIMIT = freeLimit;
+  if(shipCairo) window.HARFAA_SHIP_CAIRO = shipCairo;
+  if(shipOther) window.HARFAA_SHIP_OTHER = shipOther;
+
+  // غير اي نص في الموقع فيه الشحن المجاني القديم
+  document.querySelectorAll('*').forEach(el=>{
+    if(el.children.length===0 && el.textContent){
+      let t = el.textContent;
+      if(freeLimit && t.includes('شحن مجاني') && t.includes('800')){
+        el.textContent = t.replace(/800/g, String(freeLimit));
+      }
+      if(S.banner && t.includes('اشتري 2')){
+        el.textContent = S.banner;
+      }
+      if(S.whatsapp && t.includes('01116887418')){
+        el.textContent = t.replace(/01116887418/g, S.whatsapp);
+      }
+    }
+  });
+
+  if(S.footer){
+    document.querySelectorAll('footer, .footer').forEach(e=>{ e.innerHTML = S.footer; });
   }
-  if(HARFAA_SITE.footer){
-    document.querySelectorAll('footer, .footer').forEach(e=>{ e.innerHTML = HARFAA_SITE.footer; });
+  // حدّث البانر اللي فوق لو موجود
+  if(S.banner){
+    const bannerEl = document.querySelector('.topBanner, .banner, .announcement');
+    if(bannerEl) bannerEl.textContent = S.banner;
   }
 }
+  // 1. اخفي المميزات المقفولة من القايمة الجانبية
+
 
 // امنع فتح ميزة مقفولة
 const _oldOpenFeature = window.openFeature;
