@@ -1,0 +1,21 @@
+{
+  "name": "Harfaa Wear",
+  "short_name": "Harfaa",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "description": "Wear Confidence, Define Your Style",
+  "icons": [
+    {
+      "src": "https://harfaa-wear.vercel.app/favicon.ico",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://harfaa-wear.vercel.app/favicon.ico",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
