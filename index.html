@@ -162,4 +162,4 @@ function startScan(){toast('افتح الكاميرا من المتصفح واس
 function captureScan(){document.getElementById('scanResult').innerHTML='<div style="background:#0f0f0f;padding:12px;border-radius:12px;margin-top:10px">مقاسك التقريبي: <b>L</b></div>';}
 function startCountdown(){let end=localStorage.getItem('harfaa_offer_end');if(!end){end=Date.now()+2*24*60*60*1000;localStorage.setItem('harfaa_offer_end',end);}setInterval(()=>{let diff=Math.max(0,Number(end)-Date.now());let d=Math.floor(diff/86400000);let h=Math.floor(diff%86400000/3600000);let m=Math.floor(diff%3600000/60000);let s=Math.floor(diff%60000/1000);let el=document.getElementById('countdown');if(el)el.textContent=String(d).padStart(2,'0')+' : '+String(h).padStart(2,'0')+' : '+String(m).padStart(2,'0')+' : '+String(s).padStart(2,'0');},1000);}
 startCountdown();render();updateHero();loadFromSupabase();
-</script></body></html>
+</script><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script></body></html>
