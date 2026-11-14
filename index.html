@@ -1,165 +1,282 @@
-<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Harfaa Wear | تيشيرتات أوفرسايز وهوديز قطن 100% - لبس يعمل هويتك</title>
-<meta name="description" content="Harfaa Wear - تيشيرتات أوفرسايز وهوديز وسويت شيرتات قطن 100% مصري، مقاسات S لحد 4XL. لبس يعمل هويتك.">
-<meta name="theme-color" content="#000000"><link rel="manifest" href="/manifest.json"><link rel="canonical" href="https://harfaa.store/">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet"><style>
-<div id="snowBox"></div><div class="toast" id="toast"></div>
-<div class="storyModal" id="storyModal"><img id="storyImg" src=""><h3 id="storyTitle" style="text-align:center"></h3><p id="storyText" style="color:#aaa;text-align:center;line-height:1.6"></p><button class="btn" onclick="document.getElementById('storyModal').style.display='none'">اغلاق ✖</button></div>
-<div class="sidebarOverlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
-<div class="sidebar" id="sidebar"><div class="sideHead"><b>Harfaa <span>Wear</span></b><button class="sideClose" onclick="toggleSidebar(false)">✖</button></div><input class="sideSearch" placeholder="🔍 دور على ميزة..." oninput="filterMenu(this.value)"><div id="menuList">
-<div class="sideSec">الرئيسية</div>
-<div class="sideItem" onclick="showHome()"><div class="ic">🏠</div><div><b>الرئيسية</b><small>Wear Confidence</small></div></div>
-<div class="sideItem" onclick="openFeature('stories')"><div class="ic">📱</div><div><b>Harfaa Stories</b><small>ستوري كل يوم</small></div></div>
-<div class="sideItem" onclick="openFeature('track')"><div class="ic">📦</div><div><b>تتبع طلبك</b><small>رقم الطلب + رقم الموبايل</small></div></div>
-<div class="sideSec">المتجر</div>
-<div class="sideItem" onclick="openShop('Tshirt')"><div class="ic">👕</div><div><b>Tshirt</b><small>كل التيشيرتات</small></div></div>
-<div class="sideItem" onclick="openShop('Hoodies')"><div class="ic">🧥</div><div><b>Hoodies</b><small>كل الهوديز</small></div></div>
-<div class="sideItem" onclick="openShop('Sweatshirts')"><div class="ic">🧶</div><div><b>Sweatshirts</b><small>سويت شيرتات</small></div></div>
-<div class="sideSec">العب واكسب 🎁</div>
-<div class="sideItem" onclick="openFeature('league')"><div class="ic">🏆</div><div><b>Harfaa League</b><small>بطولة الشهر</small></div></div>
-<div class="sideItem" onclick="openFeature('mystery')"><div class="ic">🕵️</div><div><b>العميل السري</b><small>بوكس مجاني كل شهر</small></div></div>
-<div class="sideItem" onclick="openFeature('wheel')"><div class="ic">🎡</div><div><b>عجلة الحظ</b><small>لف واكسب خصم</small></div></div>
-<div class="sideItem" onclick="openFeature('scratch')"><div class="ic">🪙</div><div><b>خدش واكسب</b><small>اخدش واكسب خصم</small></div></div>
-<div class="sideItem" onclick="openFeature('coins')"><div class="ic">🪙</div><div><b>Harfaa Coin</b><small>بيع عملاتك وخد فلوس</small></div></div>
-<div class="sideItem" onclick="openFeature('points')"><div class="ic">🎁</div><div><b>نقاطي وهداياي</b><small>بدّل نقاطك بخصم</small></div></div>
-<div class="sideSec">ذكاء اصطناعي 🧠</div>
-<div class="sideItem" onclick="openFeature('stylist')"><div class="ic">🧠</div><div><b>AI Stylist</b><small>ايه اللون اللي هيليق عليك؟</small></div></div>
-<div class="sideItem" onclick="openFeature('voice')"><div class="ic">🎤</div><div><b>مساعد صوتي</b><small>اتكلم والموقع يرد عليك</small></div></div>
-<div class="sideItem" onclick="openFeature('scan')"><div class="ic">📷</div><div><b>مقاسك بالكاميرا</b><small>AI Body Scan</small></div></div>
-<div class="sideItem" onclick="openFeature('size')"><div class="ic">📏</div><div><b>مساعد المقاس</b><small>اكتب طولك ووزنك</small></div></div>
-<div class="sideItem" onclick="openFeature('try')"><div class="ic">📸</div><div><b>جرّب على صورتك</b><small>شوف التيشيرت عليك</small></div></div>
-<div class="sideSec">صمم واشترك 🎨</div>
-<div class="sideItem" onclick="openFeature('design')"><div class="ic">🎨</div><div><b>صمم تيشيرتك</b><small>تيشيرت مفيش حد لابس زيه</small></div></div>
-<div class="sideItem" onclick="openFeature('box')"><div class="ic">📦</div><div><b>بوكس Harfaa الشهري</b><small>تيشيرت مفاجأة كل شهر</small></div></div>
-<div class="sideItem" onclick="openFeature('vip')"><div class="ic">👑</div><div><b>عضوية VIP</b><small>خصم 20% على طول</small></div></div>
-<div class="sideItem" onclick="openFeature('ref')"><div class="ic">💸</div><div><b>هات صحابك وخد 50ج</b><small>كل صاحب يجيبلك 50ج</small></div></div>
-<div class="sideItem" onclick="openFeature('birth')"><div class="ic">🎂</div><div><b>عيد ميلادك</b><small>خصم 10% هدية</small></div></div>
-<div class="sideSec">الصفحات</div>
-<div class="sideItem" onclick="openPage('about')"><div class="ic">❤️</div><div><b>About Us</b><small>قصة Harfaa Wear</small></div></div>
-<div class="sideItem" onclick="openPage('contact')"><div class="ic">📞</div><div><b>Contact Us</b><small>تواصل معانا</small></div></div>
-<div class="sideItem" onclick="openPage('shipping')"><div class="ic">🚚</div><div><b>Shipping Policy</b><small>سياسة الشحن</small></div></div>
-<div class="sideItem" onclick="openPage('returns')"><div class="ic">🔄</div><div><b>Returns</b><small>الاستبدال والارجاع</small></div></div>
-<div class="sideItem" onclick="openFeature('pay')"><div class="ic">💳</div><div><b>طرق الدفع</b><small>فودافون كاش - انستا باي - كاش</small></div></div>
-</div><button class="btn2" onclick="window.open('https://wa.me/201116887418')">💬 كلم Harfaa على واتساب</button></div>
-<div class="drawerOverlay" id="drawerOverlay" onclick="toggleCartDrawer(false)"></div>
-<div class="cartDrawer" id="cartDrawer"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">Your Cart (<span id="drawerCount">0</span>)</h3><button class="sideClose" onclick="toggleCartDrawer(false)">✖</button></div><div id="drawerItems" style="margin:14px 0"></div><div id="drawerSummary" style="background:#0f0f0f;padding:12px;border-radius:12px;margin:10px 0"></div><button class="btn" style="width:100%" onclick="goCheckout()">Checkout →</button><button class="btn2" onclick="toggleCartDrawer(false)">Continue Shopping</button><button class="btn2" style="background:#25D366;color:#fff" onclick="checkoutWhatsApp()">Checkout via WhatsApp 💬</button></div>
-<a class="waBtn" href="https://wa.me/201116887418?text=ازيك%20عايز%20استفسر%20عن%20منتج" target="_blank">💬</a>
-<div class="aiFab" onclick="toggleAI()">🤖</div><div class="aiPanel" id="aiPanel"><b>🤖 مساعد Harfaa الذكي</b><div class="aiMsgs" id="aiMsgs"><div>🤖 اهلا بيك! اكتبلي "عايز هودي"</div></div><div style="display:flex;gap:8px"><input id="aiInput" placeholder="اكتب سؤالك..."><button class="btn" style="padding:11px 10px" onclick="startVoice()">🎤</button><button class="btn" style="padding:11px 16px" onclick="askAI()">ارسال</button></div></div>
-<header><button class="menuBtn" onclick="toggleSidebar(true)">☰</button><b>Harfaa <span>Wear</span></b><div style="display:flex;gap:6px"><button class="topbtn" onclick="toggleTheme()">☀️</button><button class="topbtn" onclick="showFavs()">❤️ <span id="favCount">0</span></button><button class="topbtn" onclick="toggleCartDrawer(true)">🛒 (<span id="cCount">0</span>)</button></div></header>
-<div class="hero" id="heroSection"><span class="tag">❄️ WINTER DROP 2026 - خصم 10% بكود HARFAA10</span><div class="heroMain"><div class="heroLeft"><h1>Wear Confidence,<br>Define Your Style.</h1><p>Premium oversized cotton tee crafted for comfort and confidence. Soft, breathable, and made to move with you.</p><button class="getLookBtn" onclick="openProductPage(heroIndex)">Get the look →</button><div class="heroSocials"><a href="https://www.instagram.com/harfaa.store" target="_blank" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)">📸</a><a href="https://www.facebook.com/share/19dCBcHz7w/" target="_blank" style="background:#1877F2">f</a><a href="https://www.tiktok.com/@harfaa.store" target="_blank" style="background:#000">♪</a><a href="https://wa.me/201116887418" target="_blank" style="background:#25D366">💬</a></div></div><div class="heroCenter"><div class="hanger">🪝</div><div class="shirtWrap"><img id="heroImg" src="" onclick="openProductPage(heroIndex)"></div><button class="heroArrow" onclick="nextHero(1)">‹</button><div style="font-size:12px;opacity:.8;margin-top:6px" id="heroName"></div></div><div class="heroRight"><div class="heroPrice"><span id="heroPrice">450</span> <small>جنيه</small></div><p style="font-size:13px;opacity:.8;margin:6px 0">Choose your size</p><div class="sizes" style="justify-content:center" id="heroSizes"></div><div style="font-size:12px;opacity:.8;margin-top:6px">اللون: <b id="heroColorName"></b></div><div style="font-size:12px;opacity:.8;margin-top:10px">🎨 لون الخلفية:</div><div class="dots" style="justify-content:center;margin-top:6px" id="heroDots"></div></div></div><div class="countBox">⏰ عرض الشتا بيخلص بعد<br><b id="countdown">02 : 00 : 00 : 00</b></div><div class="heroBottom">Dress Better. Feel Better.</div></div>
-<div class="wrap"><div id="homeView">
-<div class="feat"><div><b>❄️</b><br>شتوي<br><span style="color:#888">هوديز تقيلة</span></div><div><b>💯</b><br>قطن 100%<br><span style="color:#888">جودة مضمونة</span></div><div><b>🎁</b><br>هدية مجانية<br><span style="color:#888">مع اول طلب</span></div></div>
-<div class="freeBar"><b>🚚 شحن مجاني لو طلبت بـ 800ج او اكتر</b><div style="font-size:13px;color:#aaa;margin-top:4px" id="freeText"></div><div class="bar"><div class="fill" id="freeFill" style="width:0%"></div></div></div>
-<div class="bundle"><h3>🎁 عرض البندل: اشتري 2 وخد التالت بنص الثمن!</h3></div>
-<h2 style="font-size:20px;margin:10px 0">🔥 المنتجات</h2>
-<div class="searchRow"><input id="search" placeholder="🔍 ابحث..." oninput="render()" style="flex:2"><select id="filterCat" onchange="render()" style="max-width:130px"><option value="">كل الأقسام</option><option>Tshirt</option><option>Hoodies</option><option>Sweatshirts</option></select><select id="filterColor" onchange="render()" style="max-width:130px"><option value="">كل الألوان</option><option>اسود</option><option>ابيض</option><option>اخضر</option><option>نبيتي</option><option>وردي</option><option>بيج</option></select><select id="sortBy" onchange="render()" style="max-width:160px"><option value="">ترتيب افتراضي</option><option value="low">من الأرخص للأغلى</option><option value="high">من الأغلى للأرخص</option></select></div>
-<div id="prods" class="grid"></div>
-<div class="videoBox"><video controls poster="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80"><source src="https://cdn.coverr.co/videos/coverr-woman-wearing-a-hoodie-1644/1080p.mp4" type="video/mp4"></video><div style="padding:14px"><b>🎬 شوف التيشيرت على الطبيعة</b></div></div>
-<h2 style="font-size:20px;margin:18px 0 6px">⭐ اراء عملائنا</h2><div class="reviews"><div class="rev"><b>عمر - القاهرة ⭐⭐⭐⭐⭐</b><p>"الخامة تحفة بجد، والمقاس مظبوط بالظبط."</p></div><div class="rev"><b>مريم - الجيزة ⭐⭐⭐⭐⭐</b><p>"الهودي البيج تقيل وشكله شيك اوي ❤️"</p></div></div></div>
-<div id="featureView" style="display:none"><button class="btn2" onclick="showHome()">← ارجع للرئيسية</button><h2 id="featureTitle" style="margin:12px 0"></h2><div id="featureContent"></div></div>
-<div id="productView" style="display:none"><button class="btn2" onclick="showHome()">← ارجع للرئيسية</button><div id="productContent"></div></div>
-<div id="checkoutView" style="display:none"><button class="btn2" onclick="showHome()">← ارجع للرئيسية</button><div id="checkoutContent"></div></div>
-<div id="successView" style="display:none"><div id="successContent"></div></div></div>
-<div class="footer"><b style="color:#fff;font-size:16px">Harfaa Wear</b><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px"><div><b style="color:#fff">المتجر</b><a href="#" onclick="openShop('Tshirt');return false">Tshirt</a><a href="#" onclick="openShop('Hoodies');return false">Hoodies</a><a href="#" onclick="openShop('Sweatshirts');return false">Sweatshirts</a><a href="#" onclick="openFeature('track');return false">Track Your Order</a></div><div><b style="color:#fff">مساعدة</b><a href="#" onclick="openPage('shipping');return false">Shipping Policy</a><a href="#" onclick="openPage('returns');return false">Returns</a><a href="#" onclick="openPage('privacy');return false">Privacy</a><a href="#" onclick="openPage('terms');return false">Terms</a></div></div><p style="margin:14px 0 0">💳 الدفع: كاش عند التوصيل - فودافون كاش 01032176585 - انستا باي 01032176585<br>📱 واتساب: 01116887418<br>🚚 الشحن: القاهرة والجيزة 60ج - باقي المحافظات 90ج - التوصيل 2-4 ايام - استبدال مجاني 14 يوم</p></div>
-<div class="cartBar"><div><b>🛒 السلة:</b> <span id="cTotal">0</span> ج • <span id="cItems">0 منتج</span></div><button class="btn" style="padding:10px 16px" onclick="toggleCartDrawer(true)">اتمام الطلب →</button></div>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harfaa Wear | هرفعة وير</title>
+<meta name="description" content="Harfaa Wear - WINTER DROP 2026">
+<meta name="theme-color" content="#ffb300">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Cairo',sans-serif}
+body{background:#f6f2ea;color:#111}
+button{cursor:pointer;border:0;font-family:inherit}
+.topbar{background:#111;color:#fff;text-align:center;padding:8px;font-size:13px;font-weight:700}
+header{position:sticky;top:0;z-index:50;background:#fff;display:flex;align-items:center;gap:10px;padding:10px 14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.logo{font-weight:900;font-size:22px;white-space:nowrap}.logo span{color:#ffb300}
+.search{flex:1;display:flex;background:#f1ede4;border-radius:999px;padding:6px 12px;gap:6px}.search input{flex:1;border:0;background:transparent;outline:0}
+.menuBtn{font-size:22px;background:#111;color:#fff;width:42px;height:42px;border-radius:12px}
+.cartBtn{background:#ffb300;font-weight:900;padding:10px 14px;border-radius:999px;white-space:nowrap}
+.layout{display:flex;max-width:1300px;margin:auto;gap:16px;padding:14px}
+aside{width:235px;background:#fff;border-radius:18px;padding:14px;height:fit-content;position:sticky;top:70px}
+aside h3{font-size:14px;margin:14px 0 8px;color:#888}
+.sideItem{display:flex;justify-content:space-between;width:100%;text-align:right;background:transparent;padding:10px;border-radius:12px;font-weight:700}
+.sideItem.active,.sideItem:hover{background:#111;color:#fff}
+.sideItem small{opacity:.6;font-weight:400}
+main{flex:1;min-width:0}
+.hero{background:#111;color:#fff;border-radius:22px;display:flex;align-items:center;justify-content:space-between;padding:24px}
+.hero h1{font-size:38px;line-height:1.1;font-weight:900}.hero h1 span{color:#ffb300}
+.hero p{opacity:.8;margin:10px 0 16px}.heroBtn{background:#ffb300;padding:12px 20px;border-radius:999px;font-weight:900}
+.heroBadge{background:#ffb300;color:#111;padding:6px 12px;border-radius:999px;font-weight:900;font-size:13px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.filters button,.filters select{background:#fff;padding:9px 14px;border-radius:999px;font-weight:700;border:1px solid #eee}
+.filters button.active{background:#111;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.card{background:#fff;border-radius:18px;overflow:hidden;position:relative;cursor:pointer}
+.card img{width:100%;height:250px;object-fit:cover;display:block;background:#eee}
+.cardBody{padding:12px}.cardBody h4{font-size:16px}
+.price{font-weight:900;margin:6px 0}.price s{color:#999;font-weight:400;font-size:13px}
+.tag{position:absolute;top:10px;right:10px;background:#ffb300;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:900}
+.heart{position:absolute;top:10px;left:10px;background:#fff;width:34px;height:34px;border-radius:50%;font-size:18px}
+.addBtn{width:100%;background:#111;color:#fff;padding:11px;border-radius:12px;font-weight:900;margin-top:8px}
+.section{background:#fff;border-radius:18px;padding:16px;margin-top:16px;line-height:1.8}
+.coinsBox{background:linear-gradient(135deg,#111,#3a2a00);color:#fff;border-radius:18px;padding:16px;margin-top:16px;display:flex;justify-content:space-between;align-items:center}
+footer{background:#111;color:#fff;text-align:center;padding:22px;margin-top:20px;line-height:1.8}
+.drawer{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:100}.drawer.open{display:block}
+.drawerInner{position:absolute;left:0;top:0;bottom:0;width:min(420px,100%);background:#fff;padding:16px;overflow:auto}
+.cartItem{display:flex;gap:10px;margin:10px 0;align-items:center}.cartItem img{width:64px;height:64px;object-fit:cover;border-radius:12px}
+.qtyBtn{width:28px;height:28px;border-radius:50%;background:#eee;font-weight:900}
+.checkoutBtn{width:100%;background:#25D366;color:#fff;padding:14px;border-radius:14px;font-weight:900;margin-top:12px;font-size:16px}
+.input{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;margin:6px 0;outline:0}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:120;padding:14px}.modal.open{display:flex}
+.modalBox{background:#fff;border-radius:20px;max-width:520px;width:100%;max-height:90vh;overflow:auto}
+.modalBox img{width:100%;height:320px;object-fit:cover}.modalPad{padding:16px}
+.chip{display:inline-block;background:#f1ede4;padding:6px 12px;border-radius:999px;margin:4px;cursor:pointer;font-weight:700}.chip.sel{background:#111;color:#fff}
+@media(max-width:820px){aside{display:none}aside.show{display:block;position:fixed;z-index:90;right:10px;top:70px;box-shadow:0 10px 30px rgba(0,0,0,.2)}.hero h1{font-size:28px}.grid{grid-template-columns:repeat(2,1fr)}.card img{height:170px}}
+</style>
+</head>
+<body>
+<div class="topbar">🔥 WINTER DROP 2026 وصل - شحن سريع لكل المحافظات</div>
+<header>
+<button class="menuBtn" onclick="document.getElementById('sidebar').classList.toggle('show')">☰</button>
+<div class="logo">HARFAA <span>WEAR</span></div>
+<label class="search"><span>🔍</span><input id="search" placeholder="دور على هودي، تيشيرت..." oninput="render()"></label>
+<button class="cartBtn" onclick="openCart()">🛒 الكارت (<span id="cartCount">0</span>)</button>
+</header>
+<div class="layout">
+<aside id="sidebar">
+<h3>الأقسام</h3><div id="catList"></div>
+<h3>مميزات هرفعة</h3>
+<button class="sideItem" onclick="openFeature('stories')">Harfaa Stories <small>قصصنا</small></button>
+<button class="sideItem" onclick="openFeature('track')">Track Order <small>تتبع طلبك</small></button>
+<button class="sideItem" onclick="openFeature('tshirt')">T-Shirt <small>تيشيرتات</small></button>
+<button class="sideItem" onclick="openFeature('hoodies')">Hoodies <small>هوديز</small></button>
+<button class="sideItem" onclick="openFeature('sweatshirts')">Sweatshirts <small>سويت شيرت</small></button>
+<button class="sideItem" onclick="openFeature('sweatpants')">Sweatpants <small>سويت بانتس</small></button>
+<button class="sideItem" onclick="openFeature('league')">Harfaa League <small>الدوري</small></button>
+<button class="sideItem" onclick="openFeature('mystery')">Mystery Box <small>صندوق المفاجآت</small></button>
+<button class="sideItem" onclick="openFeature('coins')">Harfaa Coins <small>نقطك</small></button>
+<button class="sideItem" onclick="openFeature('stylist')">AI Stylist <small>ستايلست</small></button>
+<button class="sideItem" onclick="openFeature('scan')">Body Scan <small>قياس الجسم</small></button>
+<button class="sideItem" onclick="openFeature('design')">Design Yours <small>صمم بنفسك</small></button>
+<button class="sideItem" onclick="openFeature('contact')">Contact <small>كلمنا</small></button>
+</aside>
+<main>
+<div class="hero"><div>
+<span class="heroBadge">WINTER DROP 2026 ❄️</span>
+<h1>HARFAA<br><span>WEAR</span> CONFIDENCE</h1>
+<p>هوديز وتيشيرتات وسويت بانتس بخامات تقيلة وشكل يليق بيك.</p>
+<button class="heroBtn" onclick="document.getElementById('grid').scrollIntoView({behavior:'smooth'})">تسوق دلوقتي ↓</button>
+</div><div style="font-size:90px">🧥</div></div>
+<div class="coinsBox"><div><b>🪙 Harfaa Coins</b><div style="opacity:.8;font-size:13px">كل 100 جنيه = 10 Coins - بدّلهم بخصم</div></div><b style="font-size:22px"><span id="coins">0</span> Coins</b></div>
+<div class="filters"><button class="active" onclick="setCat('all',this)">الكل</button><div id="filterBtns" style="display:contents"></div><select id="sort" onchange="render()"><option value="new">الأحدث</option><option value="low">السعر: من الأقل</option><option value="high">السعر: من الأعلى</option></select></div>
+<div id="status" style="background:#fff;padding:12px;border-radius:12px;margin-bottom:12px">⏳ جاري تحميل المنتجات من Supabase...</div>
+<div class="grid" id="grid"></div>
+<div class="section" id="featureBox" style="display:none"></div>
+<div class="section"><h3>ليه هرفعة؟</h3><p>✅ خامة تقيلة ومضمونة &nbsp; ✅ مقاسات من S لـ 3XL &nbsp; ✅ استبدال واسترجاع سهل &nbsp; ✅ دفع عند الاستلام</p><p>📦 شحن لكل المحافظات - 💬 واتساب: 01116887418</p></div>
+</main>
+</div>
+<footer><b>HARFAA WEAR</b><br>واتساب: 01116887418<br>harfaa.store © 2026</footer>
+<div class="drawer" id="cartDrawer"><div class="drawerInner">
+<div style="display:flex;justify-content:space-between;align-items:center"><h2>🛒 الكارت</h2><button onclick="closeCart()" style="font-size:22px;background:none">✕</button></div>
+<div id="cartItems"></div>
+<div style="margin-top:14px"><b>الاجمالي: <span id="cartTotal">0</span> جنيه</b></div>
+<input class="input" id="custName" placeholder="اسمك">
+<input class="input" id="custPhone" placeholder="رقم موبايلك">
+<input class="input" id="custAddress" placeholder="العنوان بالتفصيل">
+<button class="checkoutBtn" onclick="checkout()">اطلب على واتساب 💬</button>
+<button onclick="clearCart()" style="width:100%;margin-top:8px;background:none;padding:10px">امسح الكارت</button>
+</div></div>
+<div class="modal" id="productModal"><div class="modalBox"><div id="modalContent"></div></div></div>
 <script>
-const sb=window.supabase.createClient("https://uuxrjiytnnxsbhymkdfd.supabase.co","sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI");
-let supaProducts=null,supaCategories=[];
-function aiImage(color,cat){let map={'اسود':'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80','ابيض':'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&q=80','اخضر':'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80','نبيتي':'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=800&q=80','وردي':'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80','بيج':'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80'};if(cat==='Hoodies')return 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80';return map[color]||map['اسود'];}
-let cart=[];let sel={};let selSize={};let selColor={};let favs=JSON.parse(localStorage.getItem('harfaa_favs')||'[]');let points=parseInt(localStorage.getItem('harfaa_points')||'120');let coins=parseInt(localStorage.getItem('harfaa_coins')||'85');let proofUploaded=false;let proofName='';let leaguePoints=parseInt(localStorage.getItem('harfaa_league')||'320');let heroIndex=0;let heroSize='S';let isOrdering=false;let refBalance=parseInt(localStorage.getItem('harfaa_ref')||'0');
-const PAY_NUMBER='01032176585';const WHATS_NUMBER='201116887418';const SIZES=['S','M','L','XL','2XL','3XL','4XL'];
-const COLOR_MAP=[{name:'اسود',bg:'#111111'},{name:'ابيض',bg:'#f5f5f5'},{name:'اخضر',bg:'#1e5a3a'},{name:'نبيتي',bg:'#6b1a2a'},{name:'وردي',bg:'#f8a5c2'},{name:'بيج',bg:'#d9c7a7'}];
-function detectColorFromName(name){name=(name||'').toLowerCase();if(name.includes('ابيض')||name.includes('white'))return COLOR_MAP[1];if(name.includes('اخضر')||name.includes('green')||name.includes('زيتي'))return COLOR_MAP[2];if(name.includes('نبيتي')||name.includes('برجاندي')||name.includes('burgundy'))return COLOR_MAP[3];if(name.includes('وردي')||name.includes('pink'))return COLOR_MAP[4];if(name.includes('بيج')||name.includes('beige')||name.includes('كافيه'))return COLOR_MAP[5];return COLOR_MAP[0];}
-function getDB(){if(supaProducts){return {products:supaProducts,orders:[],coupons:[{code:'HARFAA10',val:10,type:'percent',active:true,used:0}]};}let d=JSON.parse(localStorage.getItem('harfaa_db_v3')||'null');if(!d){d={products:[{id:1,name:'تيشيرت أوفرسايز أسود',price:450,img:aiImage('اسود','Tshirt'),color:'اسود',cat:'Tshirt',stock:20,desc:'Premium oversized cotton tee - قطن 100%',bg:'#111111',sizes:SIZES,isAI:true},{id:2,name:'تيشيرت أوفرسايز أبيض',price:450,img:aiImage('ابيض','Tshirt'),color:'ابيض',cat:'Tshirt',stock:15,desc:'Premium oversized cotton tee',bg:'#f5f5f5',sizes:SIZES,isAI:true},{id:3,name:'تيشيرت أوفرسايز أخضر غامق',price:450,img:aiImage('اخضر','Tshirt'),color:'اخضر',cat:'Tshirt',stock:12,desc:'Premium oversized cotton tee',bg:'#1e5a3a',sizes:SIZES,isAI:true},{id:4,name:'تيشيرت أوفرسايز نبيتي برجاندي',price:450,img:aiImage('نبيتي','Tshirt'),color:'نبيتي',cat:'Tshirt',stock:10,desc:'Premium oversized cotton tee',bg:'#6b1a2a',sizes:SIZES,isAI:true},{id:5,name:'تيشيرت أوفرسايز وردي',price:450,img:aiImage('وردي','Tshirt'),color:'وردي',cat:'Tshirt',stock:8,desc:'Premium oversized cotton tee',bg:'#f8a5c2',sizes:SIZES,isAI:true},{id:6,name:'هودي أوفرسايز أسود',price:850,img:aiImage('اسود','Hoodies'),color:'اسود',cat:'Hoodies',stock:12,desc:'هودي شتوي تقيل',bg:'#111111',sizes:SIZES,isAI:true},{id:7,name:'هودي أوفرسايز بيج',price:850,img:aiImage('بيج','Hoodies'),color:'بيج',cat:'Hoodies',stock:10,desc:'هودي شتوي تقيل',bg:'#d9c7a7',sizes:SIZES,isAI:true}],orders:[],coupons:[{code:'HARFAA10',val:10,type:'percent',active:true,used:0}]};localStorage.setItem('harfaa_db_v3',JSON.stringify(d));}else{d.products=d.products.map(p=>({...p,sizes:(Array.isArray(p.sizes)&&p.sizes.length?p.sizes:SIZES)}));}return d;}
-function saveDB(d){localStorage.setItem('harfaa_db_v3',JSON.stringify(d));}
-async function loadFromSupabase(){try{const {data:cats}=await sb.from('categories').select('*').order('name');supaCategories=cats||[];let filter=document.getElementById('filterCat');if(filter){let old=filter.value;filter.innerHTML='<option value="">كل الأقسام</option>'+supaCategories.map(c=>`<option value="${c.name}">${c.name}</option>`).join('')+'<option>Tshirt</option><option>Hoodies</option><option>Sweatshirts</option>';if(old)filter.value=old;}const {data:prods,error}=await sb.from('products').select('*').order('created_at',{ascending:false});if(error){console.log(error.message);return;}if(prods&&prods.length>0){supaProducts=prods.map(p=>{let catName=supaCategories.find(c=>String(c.id)===String(p.category))?.name||p.category||'Tshirt';let col=detectColorFromName(p.name);return {id:p.id,name:p.name,price:Number(p.price)||0,old_price:p.old_price||null,img:p.image_url||aiImage(col.name,catName),color:col.name,cat:catName,catId:p.category,stock:Number(p.stock)||0,desc:p.details||'',details:p.details||'',bg:col.bg,sizes:Array.isArray(p.sizes)&&p.sizes.length?p.sizes:SIZES,isAI:false,featured:!!p.featured};});}}catch(e){console.log(e);}render();updateHero();}
-function isLightBg(hex){let h=(hex||'#111').replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');let r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);return (0.299*r+0.587*g+0.114*b)/255>0.6;}
-function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
-function applyHeroBg(p){let bg=p.bg||'#111';let light=isLightBg(bg);document.documentElement.style.setProperty('--heroBg',bg);document.documentElement.style.setProperty('--heroText',light?'#000':'#fff');document.documentElement.style.setProperty('--heroBtn',light?'#000':'#fff');document.documentElement.style.setProperty('--heroBtnText',light?'#fff':'#000');}
-function updateHero(){let db=getDB();if(!db.products.length)return;let p=db.products[heroIndex%db.products.length];applyHeroBg(p);document.getElementById('heroImg').src=p.img;document.getElementById('heroName').textContent=p.name;document.getElementById('heroPrice').textContent=p.price;document.getElementById('heroColorName').textContent=p.color;document.getElementById('heroSizes').innerHTML=SIZES.map(s=>`<button class="size ${s===heroSize?'active':''}" onclick="setHeroSize('${s}')">${s}</button>`).join('');document.getElementById('heroDots').innerHTML=COLOR_MAP.map(c=>`<div class="dot ${c.name===p.color?'active':''}" style="background:${c.bg}" onclick="setHeroColor('${c.name}','${c.bg}')"></div>`).join('');}
-function setHeroColor(name,bg){let db=getDB();let p=db.products[heroIndex%db.products.length];if(!p)return;p.color=name;p.bg=bg;applyHeroBg(p);document.getElementById('heroColorName').textContent=name;document.getElementById('heroDots').innerHTML=COLOR_MAP.map(c=>`<div class="dot ${c.name===name?'active':''}" style="background:${c.bg}" onclick="setHeroColor('${c.name}','${c.bg}')"></div>`).join('');}
-function setHeroSize(s){heroSize=s;updateHero();}
-function nextHero(dir){let db=getDB();heroIndex=(heroIndex+dir+db.products.length)%db.products.length;updateHero();}
-function toggleSidebar(open){document.getElementById('sidebar').classList.toggle('open',open);document.getElementById('sidebarOverlay').classList.toggle('show',open);}
-function filterMenu(q){let items=document.querySelectorAll('#menuList .sideItem');q=q.toLowerCase();items.forEach(it=>{it.style.display=it.textContent.toLowerCase().includes(q)?'flex':'none';});}
-function hideAllViews(){['homeView','featureView','productView','checkoutView','successView'].forEach(id=>document.getElementById(id).style.display='none');}
-function showHome(){hideAllViews();document.getElementById('homeView').style.display='block';toggleSidebar(false);window.scrollTo({top:0,behavior:'smooth'});render();updateHero();}
-function openShop(cat){toggleSidebar(false);hideAllViews();document.getElementById('homeView').style.display='block';let fc=document.getElementById('filterCat');if(fc)fc.value=cat==='All'?'':cat;render();window.scrollTo({top:document.getElementById('prods').offsetTop-80,behavior:'smooth'});}
-function setSizeByIndex(idx,size,el){let db=getDB();let p=db.products[idx];if(!p)return;selSize[p.id]=size;if(el){let parent=el.parentElement;parent.querySelectorAll('.size').forEach(b=>b.classList.remove('active'));el.classList.add('active');}}
-function getSelectedSize(p){return selSize[p.id]||'S';}
-function render(){let db=getDB();let q=(document.getElementById('search')?.value||'').toLowerCase();let cat=document.getElementById('filterCat')?.value||'';let col=document.getElementById('filterColor')?.value||'';let sort=document.getElementById('sortBy')?.value||'';let list=db.products.filter(p=>(!cat||p.cat===cat)&&(!col||p.color===col)&&(!q||p.name.toLowerCase().includes(q)));if(sort==='low')list.sort((a,b)=>a.price-b.price);if(sort==='high')list.sort((a,b)=>b.price-a.price);let el=document.getElementById('prods');if(!el)return;if(!list.length){el.innerHTML='<p style="grid-column:1/-1;text-align:center;color:#aaa">مفيش منتجات</p>';return;}el.innerHTML=list.map(p=>{let idx=db.products.indexOf(p);let cur=selSize[p.id]||'S';let sizes=(p.sizes&&p.sizes.length?p.sizes:SIZES);return `<div class="card"><span class="badge">${p.cat}</span><button class="favBtn" onclick="toggleFavByIndex(${idx})">${favs.includes(p.id)?'❤️':'🤍'}</button><img src="${p.img}" onclick="openProductPage(${idx})"><div class="cardBody"><b>${p.name}</b><div class="meta">${p.cat} • ${p.color}</div><div class="stars">⭐⭐⭐⭐⭐ 4.9</div><div class="lbl">🎨 اللون:</div><div class="dots">${COLOR_MAP.map(c=>`<div class="dot ${c.name===p.color?'active':''}" style="background:${c.bg}" onclick="event.stopPropagation();setCardColor(${idx},'${c.name}','${c.bg}')"></div>`).join('')}</div><div class="lbl">Choose your size:</div><div class="sizes">${sizes.map(s=>`<button class="size ${s===cur?'active':''}" onclick="event.stopPropagation();setSizeByIndex(${idx},'${s}',this)">${s}</button>`).join('')}</div><div class="priceRow"><span class="price">${p.price} جنيه</span><span class="stock">متوفر: ${p.stock}</span></div><button class="addBtn" onclick="event.stopPropagation();addToCartByIndex(${idx})">أضف للسلة 🛒</button><button class="btn2" onclick="openProductPage(${idx})">عرض المنتج</button></div></div>`;}).join('');updateCartUI();}
-function setCardColor(idx,name,bg){let db=getDB();let p=db.products[idx];if(!p)return;p.color=name;p.bg=bg;render();if(idx===heroIndex)updateHero();}
-function toggleFavByIndex(idx){let db=getDB();let p=db.products[idx];if(!p)return;if(favs.includes(p.id))favs=favs.filter(x=>String(x)!==String(p.id));else favs.push(p.id);localStorage.setItem('harfaa_favs',JSON.stringify(favs));render();}
-function showFavs(){if(!favs.length){toast('مفيش مفضلة لسه');return;}let db=getDB();let list=db.products.filter(p=>favs.includes(p.id));document.getElementById('prods').innerHTML=list.map(p=>`<div class="card"><img src="${p.img}"><div class="cardBody"><b>${p.name}</b><div>${p.price} جنيه</div><button class="addBtn" onclick="addToCartByIndex(${db.products.indexOf(p)})">أضف للسلة</button></div></div>`).join('');}
-function openProductPage(idx){let db=getDB();let p=db.products[idx];if(!p)return;hideAllViews();document.getElementById('productView').style.display='block';toggleSidebar(false);let light=isLightBg(p.bg);let related=db.products.filter(x=>x.id!==p.id).slice(0,4);let cur=getSelectedSize(p);let sizes=(p.sizes&&p.sizes.length?p.sizes:SIZES);document.getElementById('productContent').innerHTML=`<div style="background:${p.bg};color:${light?'#000':'#fff'};border-radius:18px;padding:16px;margin:14px 0"><div style="font-size:12px;opacity:.7">Home / ${p.cat} / ${p.name}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px"><div><div style="text-align:center">🪝</div><div style="text-align:center"><img src="${p.img}" style="width:100%;max-width:280px;height:300px;object-fit:cover;border-radius:14px"></div></div><div><h2 style="margin:0">${p.name}</h2><div style="color:#ffb400">⭐⭐⭐⭐⭐ 4.9 (124 تقييم)</div><div style="font-size:26px;font-weight:900;margin:8px 0">${p.price} جنيه ${p.old_price?`<s style="font-size:16px;opacity:.6">${p.old_price} جنيه</s>`:''}</div><p style="font-size:13px;opacity:.8;line-height:1.6">${p.desc}</p><div style="font-weight:800;margin:10px 0 6px">🎨 اللون:</div><div class="dots">${COLOR_MAP.map(c=>`<div class="dot ${c.name===p.color?'active':''}" style="background:${c.bg}" onclick="setProductColor(${idx},'${c.name}','${c.bg}')"></div>`).join('')}</div><div style="font-weight:800;margin:10px 0 6px">Choose your size:</div><div class="sizes">${sizes.map(s=>`<button class="size ${s===cur?'active':''}" onclick="setSizeByIndex(${idx},'${s}',this)">${s}</button>`).join('')}</div><div style="display:flex;gap:8px;align-items:center;margin:12px 0"><span>Quantity:</span><button class="size" onclick="changeQty(-1)">-</button><b id="prodQty">1</b><button class="size" onclick="changeQty(1)">+</button></div><button class="btn" style="width:100%;background:${light?'#000':'#fff'};color:${light?'#fff':'#000'}" onclick="addToCartByIndex(${idx},true);toggleCartDrawer(true)">Add to Cart</button><button class="btn" style="width:100%;margin-top:8px;background:#25D366" onclick="buyNowWhatsAppByIndex(${idx})">Buy Now via WhatsApp 💬</button><div style="font-size:12px;line-height:1.7;margin-top:10px;opacity:.85">💵 الدفع عند الاستلام<br>🚚 الشحن القاهرة والجيزة 60ج - باقي المحافظات 90ج<br>⏱️ التوصيل 2-4 ايام<br>🔄 استبدال مجاني خلال 14 يوم</div></div></div></div><h3>You may also like</h3><div class="grid">${related.map(r=>`<div class="card" onclick="openProductPage(${db.products.indexOf(r)})"><img src="${r.img}"><div class="cardBody"><b>${r.name}</b><div>${r.price} جنيه</div></div></div>`).join('')}</div>`;window.scrollTo({top:0,behavior:'smooth'});}
-function setProductColor(idx,name,bg){let db=getDB();let p=db.products[idx];if(!p)return;p.color=name;p.bg=bg;openProductPage(idx);}
-let prodQty=1;function changeQty(d){prodQty=Math.max(1,prodQty+d);let el=document.getElementById('prodQty');if(el)el.textContent=prodQty;}
-function addToCartByIndex(idx,silent){let db=getDB();let p=db.products[idx];if(!p)return;let size=selSize[p.id]||'S';let found=cart.find(c=>String(c.id)==String(p.id)&&c.size===size);if(found)found.qty++;else cart.push({id:p.id,name:p.name,price:p.price,img:p.img,size:size,qty:1});updateCartUI();if(!silent){toast('✅ اتضاف: '+p.name+' - مقاس '+size);toggleCartDrawer(true);}}
-function buyNowWhatsAppByIndex(idx){let db=getDB();let p=db.products[idx];let size=selSize[p.id]||'S';window.open('https://wa.me/'+WHATS_NUMBER+'?text='+encodeURIComponent('عايز اشتري '+p.name+' - مقاس '+size+' - '+p.price+'ج'));}
-function updateCartUI(){let total=cart.reduce((s,c)=>s+c.price*c.qty,0);let count=cart.reduce((s,c)=>s+c.qty,0);let c1=document.getElementById('cCount');if(c1)c1.textContent=count;let c2=document.getElementById('cItems');if(c2)c2.textContent=count+' منتج';let c3=document.getElementById('cTotal');if(c3)c3.textContent=total;let dc=document.getElementById('drawerCount');if(dc)dc.textContent=count;let di=document.getElementById('drawerItems');if(di)di.innerHTML=cart.length?cart.map((c,i)=>`<div style="display:flex;gap:10px;padding:10px;border:1px solid #222;border-radius:12px;margin-bottom:8px;align-items:center"><img src="${c.img}" style="width:56px;height:56px;object-fit:cover;border-radius:10px"><div style="flex:1"><b>${c.name}</b><br><small style="color:#aaa">مقاس: ${c.size} • ${c.price}ج</small><br><button onclick="changeCartQty(${i},-1)">-</button> ${c.qty} <button onclick="changeCartQty(${i},1)">+</button></div><button onclick="removeCart(${i})" style="background:#ff3b30;border:0;color:#fff;border-radius:50%;width:28px;height:28px">✖</button></div>`).join(''):'<p style="color:#888;text-align:center">السلة فاضية</p>';let ship=total>=800?0:(total===0?0:60);let ds=document.getElementById('drawerSummary');if(ds)ds.innerHTML=`<div style="display:flex;justify-content:space-between"><span>Subtotal</span><b>${total}ج</b></div><div style="display:flex;justify-content:space-between;margin-top:6px"><span>Shipping</span><b>${ship===0?'مجاني':ship+'ج'}</b></div><div style="display:flex;justify-content:space-between;margin-top:8px;font-size:18px"><span>Total</span><b>${total+ship}ج</b></div>`;let ft=document.getElementById('freeText');if(ft){ft.textContent=total>=800?'✅ وصلت للشحن المجاني':`فاضلك ${800-total}ج وتاخد شحن مجاني`;document.getElementById('freeFill').style.width=Math.min(100,total/8)+'%';}let fc=document.getElementById('favCount');if(fc)fc.textContent=favs.length;}
-function changeCartQty(i,d){cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);updateCartUI();}
-function removeCart(i){cart.splice(i,1);updateCartUI();}
-function toggleCartDrawer(open){document.getElementById('cartDrawer').classList.toggle('open',open);document.getElementById('drawerOverlay').classList.toggle('show',open);}
-function goCheckout(){if(!cart.length){toast('السلة فاضية - ضيف منتج الأول');return;}toggleCartDrawer(false);hideAllViews();document.getElementById('checkoutView').style.display='block';let total=cart.reduce((s,c)=>s+c.price*c.qty,0);let ship=total>=800?0:60;document.getElementById('checkoutContent').innerHTML=`<h2>Checkout - اتمام الطلب</h2><div style="background:#161617;border:1px solid #222;border-radius:14px;padding:14px;margin:10px 0">${cart.map(c=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222"><span>${c.name} - ${c.size} × ${c.qty}</span><b>${c.price*c.qty}ج</b></div>`).join('')}<div style="display:flex;justify-content:space-between;margin-top:10px"><span>الشحن</span><b>${ship===0?'مجاني':ship+'ج'}</b></div><div style="display:flex;justify-content:space-between;font-size:18px;margin-top:6px"><span>الاجمالي</span><b>${total+ship}ج</b></div></div><div style="background:#161617;border:1px solid #222;border-radius:14px;padding:14px"><input id="coName" placeholder="الاسم بالكامل *"><input id="coPhone" placeholder="رقم الموبايل * - 01xxxxxxxxx" style="margin-top:8px"><select id="coGov" style="margin-top:8px"><option value="">اختار المحافظة *</option><option>القاهرة</option><option>الجيزة</option><option>الاسكندرية</option><option>الدقهلية</option><option>الشرقية</option><option>الغربية</option><option>المنوفية</option><option>القليوبية</option><option>البحيرة</option><option>كفر الشيخ</option><option>دمياط</option><option>بورسعيد</option><option>الاسماعيلية</option><option>السويس</option><option>الفيوم</option><option>بني سويف</option><option>المنيا</option><option>اسيوط</option><option>سوهاج</option><option>قنا</option><option>الاقصر</option><option>اسوان</option><option>البحر الاحمر</option><option>مطروح</option><option>شمال سيناء</option><option>جنوب سيناء</option><option>الوادي الجديد</option></select><textarea id="coAddr" placeholder="العنوان بالتفصيل *" style="margin-top:8px"></textarea><textarea id="coNotes" placeholder="ملاحظات (اختياري)" style="margin-top:8px"></textarea><div style="margin:12px 0"><b>طريقة الدفع:</b><select id="payMethod" onchange="showPayInfo()" style="margin-top:6px"><option value="كاش عند الاستلام">💵 كاش عند الاستلام</option><option value="Vodafone Cash">📱 فودافون كاش - 01032176585</option><option value="InstaPay">🏦 انستا باي - 01032176585</option></select><div id="payInfo" style="display:none;background:#1a1500;border:1px solid #ffb400;padding:10px;border-radius:12px;margin-top:8px"></div><div class="proofBox" id="proofBox"><b>📸 ارفع صورة إثبات الدفع</b><input type="file" accept="image/*" onchange="previewProof(event)"><div id="proofPreview"></div></div></div><button class="btn" style="width:100%" onclick="placeOrder()">تأكيد الطلب ✅</button></div>`;window.scrollTo({top:0,behavior:'smooth'});}
-function checkoutWhatsApp(){if(!cart.length){toast('السلة فاضية');return;}let txt='عايز اطلب من Harfaa Wear:\n'+cart.map(c=>`- ${c.name} - مقاس ${c.size} × ${c.qty} = ${c.price*c.qty}ج`).join('\n');window.open('https://wa.me/'+WHATS_NUMBER+'?text='+encodeURIComponent(txt));}
-async function placeOrder(){let name=document.getElementById('coName').value.trim();let phone=document.getElementById('coPhone').value.trim();let gov=document.getElementById('coGov').value;let addr=document.getElementById('coAddr').value.trim();let notes=document.getElementById('coNotes').value.trim();let pay=document.getElementById('payMethod').value;if(!name||!phone||!gov||!addr){toast('❌ املى كل البيانات');return;}let total=cart.reduce((s,c)=>s+c.price*c.qty,0);let ship=total>=800?0:60;let code='HF-'+Math.floor(1000+Math.random()*9000);let itemsText=cart.map(c=>c.name+' - '+c.size+' × '+c.qty).join(' | ');const {error}=await sb.from('harfas_orders').insert([{name:name,phone:phone,gov:gov,addr:addr,notes:notes||'',pay:pay,status:'new',code:code,total:total+ship,items:itemsText}]);if(error){console.log(error);toast('❌ في مشكلة، جرب تاني');return;}cart=[];updateCartUI();hideAllViews();document.getElementById('successView').style.display='block';document.getElementById('successContent').innerHTML='<div style="text-align:center;padding:20px"><h2>✅ تم استلام طلبك!</h2><p>كود الطلب: <b>'+code+'</b></p><p>هنتواصل معاك للتأكيد</p><button class="btn" onclick="showHome()">ارجع للرئيسية</button></div>';window.scrollTo({top:0,behavior:'smooth'});}
-function openPage(name){toggleSidebar(false);hideAllViews();document.getElementById('featureView').style.display='block';let titles={about:'About Us',contact:'Contact Us',privacy:'Privacy Policy',terms:'Terms & Conditions',shipping:'Shipping Policy',returns:'Returns & Exchanges'};document.getElementById('featureTitle').textContent=titles[name]||name;let html='';if(name==='about')html=`<div class="pageBox"><h3>قصتنا</h3><p style="color:#aaa;line-height:1.8">بدأنا Harfaa من اوضة صغيرة، بحلم واحد: لبس يمثل هويتك مش مجرد لبس. قطن 100% مصري، تقيل، مريح، لونه ثابت.</p></div>`;else if(name==='contact')html=`<div class="pageBox"><h3>تواصل معانا</h3><input id="contactName" placeholder="اسمك"><input id="contactMsg" placeholder="رسالتك" style="margin-top:8px"><button class="btn" style="width:100%;margin-top:8px" onclick="sendContact()">ابعت على واتساب 💬</button><p style="color:#aaa;margin-top:10px">📱 واتساب: 01116887418<br>📸 انستجرام: @harfaa.store</p></div>`;else if(name==='privacy')html=`<div class="pageBox"><h3>Privacy Policy</h3><p style="color:#aaa;line-height:1.8">بياناتك بتستخدم بس عشان نوصلك طلبك.</p></div>`;else if(name==='terms')html=`<div class="pageBox"><h3>Terms</h3><p style="color:#aaa;line-height:1.8">الاسعار بالجنيه، الشحن 60ج / 90ج، التوصيل 2-4 ايام، الاستبدال 14 يوم.</p></div>`;else if(name==='shipping')html=`<div class="pageBox"><h3>Shipping Policy</h3><p style="color:#aaa;line-height:1.8">القاهرة والجيزة 60ج - باقي المحافظات 90ج - التوصيل 2-4 ايام - شحن مجاني فوق 800ج</p></div>`;else if(name==='returns')html=`<div class="pageBox"><h3>Returns</h3><p style="color:#aaa;line-height:1.8">استبدال مجاني خلال 14 يوم.</p></div>`;document.getElementById('featureContent').innerHTML=html;window.scrollTo({top:0,behavior:'smooth'});}
-function sendContact(){let n=document.getElementById('contactName').value;let m=document.getElementById('contactMsg').value;window.open('https://wa.me/'+WHATS_NUMBER+'?text='+encodeURIComponent(n+' - '+m));}
-function toggleAI(){let p=document.getElementById('aiPanel');p.style.display=p.style.display==='block'?'none':'block';}
-function toggleTheme(){document.body.style.background=document.body.style.background==='white'?'#0b0b0c':'white';document.body.style.color=document.body.style.color==='black'?'#fff':'black';}
-function askAI(){let v=document.getElementById('aiInput').value.trim();if(!v)return;let m=document.getElementById('aiMsgs');m.innerHTML+='<div class="me">'+v+'</div>';let ans='اهلا بيك! عندنا تيشيرتات 450ج وهوديز 850ج، قطن 100%. عايز انهي؟';if(v.includes('هودي'))ans='الهودي عندنا 850ج، تقيل وشتوي، متوفر اسود وبيج.';if(v.includes('تيشيرت'))ans='التيشيرت 450ج، اوفرسايز قطن 100%، متوفر كل الالوان.';m.innerHTML+='<div>🤖 '+ans+'</div>';document.getElementById('aiInput').value='';}
-function startVoice(){toast('🎤 اتكلم، المساعد الصوتي جاهز');}
-function openFeature(key){toggleSidebar(false);hideAllViews();document.getElementById('featureView').style.display='block';let titles={stories:'📱 Harfaa Stories',league:'🏆 Harfaa League',mystery:'🕵️ العميل السري',wheel:'🎡 عجلة الحظ',scratch:'🪙 خدش واكسب',coins:'🪙 Harfaa Coin',points:'🎁 نقاطي',stylist:'🧠 AI Stylist',voice:'🎤 مساعد صوتي',scan:'📷 مقاسك بالكاميرا',size:'📏 مساعد المقاس',try:'📸 جرّب على صورتك',design:'🎨 صمم تيشيرتك',box:'📦 بوكس Harfaa',vip:'👑 VIP',ref:'💸 هات صحابك',birth:'🎂 عيد ميلادك',look:'👌 كمّل اللوك',pay:'💳 طرق الدفع',track:'📦 تتبع طلبك'};document.getElementById('featureTitle').textContent=titles[key]||'Harfaa';let html='';
-if(key==='track')html=`<div class="trackBox"><input id="trackInput" placeholder="كود الطلب - HF-1234"><input id="trackPhone" placeholder="رقم الموبايل" style="margin-top:8px"><button class="btn" style="width:100%;margin-top:10px" onclick="trackOrder()">تتبع الطلب</button><div id="trackResult"></div><button class="btn2" onclick="window.open('https://wa.me/${WHATS_NUMBER}?text=عايز اتابع طلبي')">Track on WhatsApp 💬</button></div>`;
-else if(key==='stories')html=`<div class="storiesBox"><div class="storiesRow" id="storiesRow2"></div></div>`;
-else if(key==='league')html=`<div class="leagueBox"><div id="leagueBoard2"></div><div style="display:flex;gap:8px;margin-top:10px"><input id="leagueName" placeholder="اسمك"><button class="btn" onclick="joinLeague()">اشترك 🏆</button></div><div id="leagueResult"></div></div>`;
-else if(key==='mystery')html=`<div class="mysteryBox"><div style="display:flex;gap:8px"><input id="mysteryName" placeholder="اسمك"><input id="mysteryPhone" placeholder="رقم موبايلك"></div><button class="btn" style="width:100%;margin-top:8px" onclick="joinMystery()">ادخل سحب العميل السري 🕵️</button><div id="mysteryResult"></div></div>`;
-else if(key==='stylist')html=`<div class="stylistBox"><input type="file" accept="image/*" onchange="stylistUpload(event)"><div style="display:flex;gap:8px;margin:10px 0"><select id="stylistSkin"><option value="">لون بشرتك؟</option><option value="فاتح">فاتح</option><option value="قمحي">قمحي</option><option value="اسمر">اسمر</option></select><select id="stylistStyle"><option value="">ستايلك ايه؟</option><option value="كلاسيك">كلاسيك</option><option value="جريء">جريء</option><option value="سبور">سبور</option></select></div><button class="btn" style="width:100%" onclick="runStylist()">حلّل ستايلي 🧠</button><div class="stylistPreview" id="stylistPreview"><span style="font-size:50px">🧠</span></div><div id="stylistResult"></div></div>`;
-else if(key==='voice')html=`<div class="voiceBox"><button class="btn" style="width:100%;font-size:20px" onclick="startVoice()">🎤 اضغط واتكلم...</button><div id="voiceResult"></div></div>`;
-else if(key==='scan')html=`<div class="scanBox"><video id="scanVideo" class="scanVideo" autoplay playsinline style="display:none"></video><button class="btn" style="width:100%" onclick="startScan()">📷 افتح الكاميرا</button><button class="btn" style="width:100%;margin-top:8px;background:#22c55e;display:none" id="captureBtn" onclick="captureScan()">📸 خد القياس</button><div id="scanResult"></div></div>`;
-else if(key==='coins')html=`<div class="coinBox"><div class="coinBig">🪙 ${coins}</div><p style="text-align:center">تساوي <b>${Math.floor(coins/2)}ج</b></p><div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="useCoins()">اشتري بيها</button><button class="btn" style="flex:1;background:#25D366" onclick="sellCoins()">بيعها</button></div></div>`;
-else if(key==='points')html=`<div class="pointsBox"><b>🎁 نقاطك: ${points}</b><button style="background:#fff;border:0;padding:9px 14px;border-radius:999px;font-weight:800" onclick="redeemPoints()">بدّل نقاطي</button></div>`;
-else if(key==='wheel')html=`<div class="wheelBox"><div class="wheel" id="wheel"></div><button class="btn" onclick="spinWheel()">لف العجلة 🎡</button><div id="wheelResult"></div></div>`;
-else if(key==='scratch')html=`<div class="scratchBox"><div class="scratchArea" onclick="scratch(this)"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:900">🎉 كسبت خصم 10% - SCRATCH10</div><div class="scratchCover" id="scratchCover">🪙 اخدش هنا</div></div></div>`;
-else if(key==='size')html=`<div class="sizeHelper"><div style="display:flex;gap:8px"><input id="hInput" type="number" placeholder="طولك - 175"><input id="wInput" type="number" placeholder="وزنك - 75"></div><button class="btn" style="width:100%;margin-top:8px" onclick="calcSize()">اعرف مقاسي</button><div id="sizeResult"></div></div>`;
-else if(key==='try')html=`<div class="tryBox"><input type="file" accept="image/*" onchange="tryOn(event)"><div class="tryPreview" id="tryPreview"><span style="font-size:60px">📸 ارفع صورتك</span></div></div>`;
-else if(key==='design')html=`<div class="designBox"><input type="file" accept="image/*" onchange="designUpload(event)"><input id="designText" placeholder="اكتب اسمك" oninput="updateDesignText()" style="margin-top:8px"><div class="designPreview" id="designPreview"><div style="text-align:center"><div style="font-size:70px">👕</div><b id="designTextShow">HARFAA</b></div></div><button class="btn" style="width:100%;margin-top:10px" onclick="orderCustom()">اطلب تيشيرتي المخصص - 450ج 🎨</button></div>`;
-else if(key==='box')html=`<div class="boxBox"><div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="subscribeBox('شهري - 299ج')">شهري 299ج</button><button class="btn" style="flex:1" onclick="subscribeBox('3 شهور - 799ج')">3 شهور 799ج</button></div><div id="boxResult"></div></div>`;
-else if(key==='vip')html=`<div class="vipBox"><h3>عضوية VIP 👑</h3><p style="color:#aaa">خصم 20% على طول + شحن مجاني</p><button class="btn" style="background:#ffb400;color:#000" onclick="joinVIP()">اشترك في VIP 👑</button></div>`;
-else if(key==='ref')html=`<div class="refBox"><input id="refLink" value="https://harfaa.store?ref=HARFAA50" readonly><button class="btn2" onclick="copyRef()">نسخ اللينك</button><p>رصيدك: <b>${refBalance}ج</b></p><button class="btn2" onclick="claimRef()">اطلب الـ 50ج 💸</button></div>`;
-else if(key==='birth')html=`<div class="birthBox"><div style="display:flex;gap:8px"><input id="birthInput" type="date"><button class="btn" onclick="saveBirthday()">سجّل 🎂</button></div><div id="birthResult"></div></div>`;
-else if(key==='look')html=`<div class="lookBox"><img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80"><button class="btn" style="width:100%;margin-top:10px" onclick="addToCartByIndex(5)">اضف اللوك - 850ج</button></div>`;
-else if(key==='pay')html=`<div style="background:#161617;border:1px solid #222;border-radius:14px;padding:14px"><b>💳 طرق الدفع</b><div class="payIcons"><div>💵<br>كاش</div><div>📱<br>فودافون كاش<br><b>01032176585</b></div><div>🏦<br>انستا باي<br><b>01032176585</b></div></div></div>`;
-document.getElementById('featureContent').innerHTML=html;window.scrollTo({top:0,behavior:'smooth'});if(key==='stories')renderStories2();if(key==='league')renderLeague2();}
-function renderStories2(){let stories=getAIStories();let el=document.getElementById('storiesRow2');if(!el)return;el.innerHTML=stories.map((s,i)=>`<div class="storyCircle" onclick="openStory(${i})"><img src="${s.img}"><span>${s.t}</span></div>`).join('');}
-function renderLeague2(){let board=[{n:'عمر - القاهرة',p:1250},{n:'انت',p:leaguePoints}].sort((a,b)=>b.p-a.p);let el=document.getElementById('leagueBoard2');if(el)el.innerHTML=board.map((b,i)=>`<div class="leagueRow"><span>${i+1}. ${b.n}</span><b>${b.p} نقطة</b></div>`).join('');}
-function getAIStories(){return [{t:'خصم اليوم 🔥',txt:'خصم 15% بكود STORY15',img:'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&q=80'},{t:'ورا الكواليس 🎬',txt:'شوف ازاي بنعمل التيشيرت',img:'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&q=80'},{t:'لوك اليوم 👌',txt:'تيشيرت اسود + هودي بيج',img:'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80'},{t:'عميل اليوم ⭐',txt:'عمر: الخامة تحفة',img:'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&q=80'}];}
-function openStory(i){let s=getAIStories()[i];document.getElementById('storyImg').src=s.img;document.getElementById('storyTitle').textContent=s.t;document.getElementById('storyText').textContent=s.txt;document.getElementById('storyModal').style.display='flex';}
-function joinLeague(){let n=document.getElementById('leagueName').value.trim();if(!n)return alert('اكتب اسمك');leaguePoints+=50;localStorage.setItem('harfaa_league',leaguePoints);renderLeague2();toast('اشتركت في الليج +50 نقطة');}
-function joinMystery(){let n=document.getElementById('mysteryName').value.trim();let ph=document.getElementById('mysteryPhone').value.trim();if(!n||!ph)return alert('اكتب اسمك ورقمك');window.open('https://wa.me/'+WHATS_NUMBER+'?text='+encodeURIComponent('عايز ادخل سحب العميل السري - '+n+' - '+ph));}
-function stylistUpload(e){let f=e.target.files[0];if(!f)return;let url=URL.createObjectURL(f);document.getElementById('stylistPreview').innerHTML='<img src="'+url+'">';}
-function runStylist(){let skin=document.getElementById('stylistSkin').value;if(!skin)return alert('اختار لون بشرتك');let color=skin==='فاتح'?'بيج':skin==='قمحي'?'اخضر زيتي':'ابيض';document.getElementById('stylistResult').innerHTML=`<div style="background:#0f0f0f;padding:12px;border-radius:12px">اللون اللي هيليق عليك: <b>${color}</b></div>`;}
-function showPayInfo(){let v=document.getElementById('payMethod').value;let box=document.getElementById('payInfo');let proof=document.getElementById('proofBox');if(v==='Vodafone Cash'){box.style.display='block';box.innerHTML='📱 حول على فودافون كاش: <b>'+PAY_NUMBER+'</b>';proof.style.display='block';}else if(v==='InstaPay'){box.style.display='block';box.innerHTML='🏦 حول على انستا باي: <b>'+PAY_NUMBER+'</b>';proof.style.display='block';}else{box.style.display='none';if(proof)proof.style.display='none';}}
-function previewProof(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=ev=>{proofUploaded=true;proofName=f.name;document.getElementById('proofPreview').innerHTML='<img src="'+ev.target.result+'">';};r.readAsDataURL(f);}
-async function trackOrder(){let id=document.getElementById('trackInput').value.trim();let phone=document.getElementById('trackPhone').value.trim();if(!id){toast('اكتب كود الطلب');return;}let {data}=await sb.from('harfas_orders').select('*').eq('code',id).maybeSingle();document.getElementById('trackResult').innerHTML=data?`<div style="background:#0f0f0f;padding:12px;border-radius:12px;margin-top:10px">طلبك <b>${data.code}</b> - الحالة: <b>${data.status}</b><br>الاجمالي: ${data.total}ج</div>`:'<p style="color:#ff6b6b">مش لاقيين الطلب ده، اتأكد من الكود</p>';}
-function spinWheel(){let w=document.getElementById('wheel');let deg=1440+Math.floor(Math.random()*360);w.style.transform='rotate('+deg+'deg)';setTimeout(()=>{document.getElementById('wheelResult').innerHTML='<div style="background:#0f0f0f;padding:12px;border-radius:12px;margin-top:10px">🎉 كسبت خصم 10% - كود: <b>HARFAA10</b></div>';},2100);}
-function scratch(el){let c=document.getElementById('scratchCover');if(c)c.style.display='none';}
-function calcSize(){let h=parseInt(document.getElementById('hInput').value);let w=parseInt(document.getElementById('wInput').value);if(!h||!w)return alert('اكتب طولك ووزنك');let size=h>185||w>100?'2XL':h>175||w>85?'XL':h>165?'L':'M';document.getElementById('sizeResult').innerHTML=`<div style="background:#0f0f0f;padding:12px;border-radius:12px;margin-top:10px">مقاسك المناسب: <b>${size}</b></div>`;}
-function tryOn(e){let f=e.target.files[0];if(!f)return;let url=URL.createObjectURL(f);document.getElementById('tryPreview').innerHTML='<img src="'+url+'"><div style="position:absolute;bottom:10px;font-size:60px">👕</div>';}
-function designUpload(e){let f=e.target.files[0];if(!f)return;let url=URL.createObjectURL(f);document.getElementById('designPreview').innerHTML='<img src="'+url+'" style="max-width:80%;max-height:80%">';}
-function updateDesignText(){let v=document.getElementById('designText').value;let el=document.getElementById('designTextShow');if(el)el.textContent=v||'HARFAA';}
-function orderCustom(){toast('تم استلام طلب التصميم المخصص 🎨');}
-function subscribeBox(v){document.getElementById('boxResult').innerHTML='<div style="background:#0f0f0f;padding:12px;border-radius:12px;margin-top:10px">اشتركت في بوكس '+v+' ✅ هنتواصل معاك على واتساب</div>';}
-function joinVIP(){window.open('https://wa.me/'+WHATS_NUMBER+'?text='+encodeURIComponent('عايز اشترك VIP')); }
-function copyRef(){let i=document.getElementById('refLink');i.select();document.execCommand('copy');toast('اتنسخ ✅');}
-function claimRef(){toast('تم ارسال طلب الـ 50ج 💸');}
-function saveBirthday(){document.getElementById('birthResult').innerHTML='<div style="background:#0f0f0f;padding:12px;border-radius:12px;margin-top:10px">🎂 تم التسجيل! كود خصمك: BIRTH10</div>';}
-function redeemPoints(){toast('تم تبديل النقاط بخصم 10% - كود: POINTS10');}
-function useCoins(){toast('تم استخدام الكوينز ✅');}
-function sellCoins(){window.open('https://wa.me/'+WHATS_NUMBER+'?text='+encodeURIComponent('عايز ابيع الكوينز بتاعتي')); }
-function startScan(){toast('افتح الكاميرا من المتصفح واسمح بالوصول');}
-function captureScan(){document.getElementById('scanResult').innerHTML='<div style="background:#0f0f0f;padding:12px;border-radius:12px;margin-top:10px">مقاسك التقريبي: <b>L</b></div>';}
-function startCountdown(){let end=localStorage.getItem('harfaa_offer_end');if(!end){end=Date.now()+2*24*60*60*1000;localStorage.setItem('harfaa_offer_end',end);}setInterval(()=>{let diff=Math.max(0,Number(end)-Date.now());let d=Math.floor(diff/86400000);let h=Math.floor(diff%86400000/3600000);let m=Math.floor(diff%3600000/60000);let s=Math.floor(diff%60000/1000);let el=document.getElementById('countdown');if(el)el.textContent=String(d).padStart(2,'0')+' : '+String(h).padStart(2,'0')+' : '+String(m).padStart(2,'0')+' : '+String(s).padStart(2,'0');},1000);}
-startCountdown();render();updateHero();loadFromSupabase();
-</script><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script></body></html>
+const SUPABASE_URL = "https://aurrjymsxmkhyofdb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI";
+const WHATSAPP = "201116887418";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let products = [];
+let cart = JSON.parse(localStorage.getItem('harfaa_cart')||'[]');
+let wishlist = JSON.parse(localStorage.getItem('harfaa_wish')||'[]');
+let currentCat = 'all';
+let selectedSize = 'M';
+let selectedColor = 'أسود';
+let currentProduct = null;
+
+function getField(p, names, fallback){
+  for(let n of names){ if(p[n]!==undefined && p[n]!==null && p[n]!=='') return p[n]; }
+  return fallback;
+}
+function normProduct(p, i){
+  let imgs = getField(p, ['images','image_url','image','img','photo'], '');
+  if(Array.isArray(imgs)) imgs = imgs[0]||'';
+  if(typeof imgs==='string' && imgs.startsWith('[')){ try{ imgs = JSON.parse(imgs)[0]||''; }catch(e){} }
+  let sizes = getField(p, ['sizes','size'], 'S,M,L,XL,2XL');
+  if(Array.isArray(sizes)) sizes = sizes.join(',');
+  let colors = getField(p, ['colors','color'], 'أسود,أبيض,بيج');
+  if(Array.isArray(colors)) colors = colors.join(',');
+  return {
+    id: p.id || i,
+    name: getField(p, ['name','title','product_name'], 'منتج هرفعة'),
+    price: Number(getField(p, ['price','cost'], 0))||0,
+    old_price: Number(getField(p, ['old_price','compare_at_price','original_price'], 0))||0,
+    image: imgs || 'https://via.placeholder.com/600x700?text=HARFAA',
+    category: getField(p, ['category','cat','type'], 'عام'),
+    desc: getField(p, ['description','desc','details'], 'خامة تقيلة ومضمونة من هرفعة وير.'),
+    sizes: String(sizes).split(',').map(s=>s.trim()).filter(Boolean),
+    colors: String(colors).split(',').map(s=>s.trim()).filter(Boolean)
+  };
+}
+async function load(){
+  try{
+    const { data, error } = await sb.from('products').select('*').order('created_at',{ascending:false});
+    if(error) throw error;
+    if(!data || !data.length) throw new Error('empty');
+    products = data.map(normProduct);
+    document.getElementById('status').textContent = '✅ تم تحميل ' + products.length + ' منتج من Supabase';
+  }catch(e){
+    console.log('supabase error', e);
+    document.getElementById('status').textContent = '⚠️ مش قادر اوصل لـ Supabase دلوقتي، جاري عرض منتجات تجريبية. اتأكد ان جدول products موجود وان الـ RLS مفتوح للقراءة.';
+    products = [
+      {id:1,name:'هودي هرفعة الأساسي',price:850,old_price:1100,image:'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600',category:'Hoodies',desc:'هودي تقيل مبطن',sizes:['S','M','L','XL','2XL'],colors:['أسود','بيج','رمادي']},
+      {id:2,name:'تيشيرت هرفعة',price:450,old_price:600,image:'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600',category:'T-Shirt',desc:'تيشيرت قطن 100%',sizes:['S','M','L','XL'],colors:['أبيض','أسود']},
+      {id:3,name:'سويت بانتس',price:700,old_price:900,image:'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=600',category:'Sweatpants',desc:'سويت بانتس مريح',sizes:['S','M','L','XL'],colors:['أسود','رمادي']}
+    ];
+  }
+  buildCats();
+  render();
+  updateCartUI();
+}
+function buildCats(){
+  let cats = [...new Set(products.map(p=>p.category))];
+  document.getElementById('catList').innerHTML = cats.map(c=>'<button class="sideItem" onclick="setCat(\''+c+'\',this);document.getElementById(\'grid\').scrollIntoView({behavior:\'smooth\'})">'+c+' <small>›</small></button>').join('');
+  document.getElementById('filterBtns').innerHTML = cats.map(c=>'<button onclick="setCat(\''+c+'\',this)">'+c+'</button>').join('');
+}
+function setCat(c, btn){
+  currentCat = c;
+  document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  render();
+}
+function render(){
+  let q = (document.getElementById('search').value||'').toLowerCase();
+  let list = products.filter(p=> (currentCat==='all'||p.category===currentCat) && p.name.toLowerCase().includes(q));
+  let sort = document.getElementById('sort').value;
+  if(sort==='low') list.sort((a,b)=>a.price-b.price);
+  if(sort==='high') list.sort((a,b)=>b.price-a.price);
+  if(!list.length){ document.getElementById('grid').innerHTML = '<div class="section">مفيش منتجات في القسم ده دلوقتي.</div>'; return; }
+  document.getElementById('grid').innerHTML = list.map(p=>`
+    <div class="card" onclick="openProduct(${p.id})">
+      <span class="tag">${p.category}</span>
+      <button class="heart" onclick="event.stopPropagation();toggleWish(${p.id})">${wishlist.includes(p.id)?'❤️':'🤍'}</button>
+      <img src="${p.image}" onerror="this.src='https://via.placeholder.com/600x700?text=HARFAA'">
+      <div class="cardBody"><h4>${p.name}</h4><div class="price">${p.price} ج ${p.old_price?'<s>'+p.old_price+' ج</s>':''}</div>
+      <button class="addBtn" onclick="event.stopPropagation();addToCart(${p.id})">أضف للكارت +</button></div>
+    </div>`).join('');
+}
+function openProduct(id){
+  currentProduct = products.find(p=>p.id==id); if(!currentProduct) return;
+  selectedSize = currentProduct.sizes[0]||'M'; selectedColor = currentProduct.colors[0]||'أسود';
+  document.getElementById('modalContent').innerHTML = `
+    <img src="${currentProduct.image}">
+    <div class="modalPad"><div style="display:flex;justify-content:space-between"><h2>${currentProduct.name}</h2><button onclick="closeModal()" style="background:none;font-size:22px">✕</button></div>
+    <p style="opacity:.7;margin:8px 0">${currentProduct.desc}</p>
+    <div class="price" style="font-size:22px">${currentProduct.price} ج ${currentProduct.old_price?'<s>'+currentProduct.old_price+'</s>':''}</div>
+    <b>المقاس:</b><div>${currentProduct.sizes.map(s=>'<span class="chip '+(s===selectedSize?'sel':'')+'" onclick="selectedSize=\''+s+'\';openProduct('+currentProduct.id+')">'+s+'</span>').join('')}</div>
+    <b>اللون:</b><div>${currentProduct.colors.map(c=>'<span class="chip '+(c===selectedColor?'sel':'')+'" onclick="selectedColor=\''+c+'\';openProduct('+currentProduct.id+')">'+c+'</span>').join('')}</div>
+    <button class="addBtn" style="padding:14px" onclick="addToCart(${currentProduct.id}, true)">أضف للكارت - ${currentProduct.price} ج</button>
+    <button onclick="buyNow(${currentProduct.id})" style="width:100%;background:#25D366;color:#fff;padding:14px;border-radius:12px;font-weight:900;margin-top:8px">اطلب دلوقتي على واتساب 💬</button>
+    </div>`;
+  document.getElementById('productModal').classList.add('open');
+}
+function closeModal(){ document.getElementById('productModal').classList.remove('open'); }
+function toggleWish(id){
+  wishlist = wishlist.includes(id) ? wishlist.filter(x=>x!==id) : [...wishlist, id];
+  localStorage.setItem('harfaa_wish', JSON.stringify(wishlist)); render();
+}
+function addToCart(id, fromModal){
+  let p = products.find(x=>x.id==id); if(!p) return;
+  let found = cart.find(x=>x.id==id && x.size===selectedSize && x.color===selectedColor);
+  if(found) found.qty++;
+  else cart.push({id:p.id, name:p.name, price:p.price, image:p.image, size:selectedSize, color:selectedColor, qty:1});
+  localStorage.setItem('harfaa_cart', JSON.stringify(cart)); updateCartUI();
+  if(fromModal) closeModal(); openCart();
+}
+function updateCartUI(){
+  let count = cart.reduce((s,i)=>s+i.qty,0);
+  let total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  document.getElementById('cartCount').textContent = count;
+  document.getElementById('cartTotal').textContent = total;
+  document.getElementById('coins').textContent = Math.floor(total/100)*10 + Number(localStorage.getItem('harfaa_coins')||0);
+  document.getElementById('cartItems').innerHTML = cart.length ? cart.map((it,idx)=>`
+    <div class="cartItem"><img src="${it.image}"><div style="flex:1"><b>${it.name}</b><div style="font-size:13px;opacity:.7">${it.size} - ${it.color}</div><b>${it.price} ج</b></div>
+    <button class="qtyBtn" onclick="changeQty(${idx},-1)">-</button><b>${it.qty}</b><button class="qtyBtn" onclick="changeQty(${idx},1)">+</button>
+    <button onclick="removeItem(${idx})" style="background:none">🗑️</button></div>`).join('') : '<p>الكارت فاضي، اختار حاجة من المنتجات.</p>';
+}
+function changeQty(idx, d){ cart[idx].qty += d; if(cart[idx].qty<=0) cart.splice(idx,1); localStorage.setItem('harfaa_cart', JSON.stringify(cart)); updateCartUI(); }
+function removeItem(idx){ cart.splice(idx,1); localStorage.setItem('harfaa_cart', JSON.stringify(cart)); updateCartUI(); }
+function clearCart(){ cart=[]; localStorage.setItem('harfaa_cart','[]'); updateCartUI(); }
+function openCart(){ updateCartUI(); document.getElementById('cartDrawer').classList.add('open'); }
+function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); }
+function buyNow(id){ addToCart(id,false); checkout(); }
+function checkout(){
+  if(!cart.length){ alert('الكارت فاضي'); return; }
+  let name = document.getElementById('custName').value.trim();
+  let phone = document.getElementById('custPhone').value.trim();
+  let addr = document.getElementById('custAddress').value.trim();
+  if(!name || !phone || !addr){ alert('اكتب اسمك ورقمك وعنوانك الاول'); return; }
+  let total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  let msg = '🔥 طلب جديد من Harfaa Wear%0A%0A';
+  cart.forEach(it=>{ msg += '- ' + it.name + ' | ' + it.size + ' | ' + it.color + ' | x' + it.qty + ' = ' + (it.price*it.qty) + ' ج%0A'; });
+  msg += '%0Aالاجمالي: ' + total + ' ج%0A';
+  msg += 'الاسم: ' + name + '%0Aالموبايل: ' + phone + '%0Aالعنوان: ' + addr;
+  window.open('https://wa.me/' + WHATSAPP + '?text=' + msg, '_blank');
+}
+function openFeature(key){
+  const box = document.getElementById('featureBox');
+  const data = {
+    stories: '<h3>📖 Harfaa Stories</h3><p>بدأنا من أوضة صغيرة، وهدفنا نلبس مصر كلها بستايل نضيف وخامة تقيلة.</p>',
+    track: '<h3>📦 Track Order</h3><p>ابعت رقم طلبك على واتساب 01116887418 وهنقولك طلبك فين بالظبط.</p><button class="addBtn" onclick="window.open(\'https://wa.me/201116887418?text=عايز اتتبع طلبي\')">تتبع على واتساب</button>',
+    tshirt: '<h3>👕 T-Shirt</h3><p>تيشيرتات قطن 100%.</p>',
+    hoodies: '<h3>🧥 Hoodies</h3><p>هوديز تقيلة ومبطنة للشتا.</p>',
+    sweatshirts: '<h3>🧶 Sweatshirts</h3><p>سويت شيرتات مريحة وشيك.</p>',
+    sweatpants: '<h3>👖 Sweatpants</h3><p>سويت بانتس للخروج والجيم.</p>',
+    league: '<h3>🏆 Harfaa League</h3><p>شارك في مسابقات هرفعة واكسب Coins وخصومات.</p>',
+    mystery: '<h3>🎁 Mystery Box</h3><p>بوكس مفاجآت بـ 999 ج، قيمته الحقيقية اكتر من 1500 ج. اطلبه من واتساب.</p><button class="addBtn" onclick="window.open(\'https://wa.me/201116887418?text=عايز اطلب Mystery Box\')">اطلب Mystery Box</button>',
+    coins: '<h3>🪙 Harfaa Coins</h3><p>نقطك: <b id="coins2">0</b> - كل 100 ج = 10 Coins. جمع وبدل بخصم.</p>',
+    stylist: '<h3>🤖 AI Stylist</h3><p>قولي طولك ووزنك وستايلك، وهنرشحلك المقاس والطقم المناسب. ابعتلنا على واتساب.</p><button class="addBtn" onclick="window.open(\'https://wa.me/201116887418?text=عايز مساعدة الستايلست\')">كلم الستايلست</button>',
+    scan: '<h3>📏 Body Scan</h3><p>اكتب طولك ووزنك على واتساب وهنقولك المقاس المظبوط ليك من اول مرة.</p>',
+    design: '<h3>🎨 Design Yours</h3><p>صمم هودي باسمك او تصميمك الخاص. ابعت التصميم على واتساب وهنفذهولك.</p>',
+    contact: '<h3>📞 Contact</h3><p>واتساب: 01116887418<br>انستجرام: @harfaa.wear<br>الموقع: harfaa.store</p>'
+  };
+  if(key==='tshirt') setCat('T-Shirt',null);
+  if(key==='hoodies') setCat('Hoodies',null);
+  if(key==='sweatshirts') setCat('Sweatshirts',null);
+  if(key==='sweatpants') setCat('Sweatpants',null);
+  box.style.display='block'; box.innerHTML = data[key]||data.stories;
+  box.scrollIntoView({behavior:'smooth'});
+  if(key==='coins'){ let total = cart.reduce((s,i)=>s+i.price*i.qty,0); document.getElementById('coins2').textContent = Math.floor(total/100)*10; }
+}
+load();
+</script>
+</body>
+</html>
