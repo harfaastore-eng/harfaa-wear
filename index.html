@@ -75,6 +75,76 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const sb=window.supabase.createClient("https://uuxrjiytnnxsbhymkdfd.supabase.co","sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI");
+  // ===== HARFAA GLOBAL SETTINGS - بيسمع من الادمن عند كل الناس =====
+let HARFAA_FEATURES = {};
+let HARFAA_SITE = {};
+const FEATURE_MAP = {
+  stories:'stories', league:'league', mystery:'secret', wheel:'wheel', scratch:'scratch',
+  coins:'coin', points:'points', stylist:'stylist', voice:'voice', scan:'camera',
+  size:'size_helper', try:'try_on', design:'design', box:'monthly_box', vip:'vip',
+  ref:'referral', birth:'birthday', look:'complete_look', track:'tracking'
+};
+
+async function loadHarfaaSettings(){
+  try{
+    const {data} = await sb.from('harfaa_settings').select('*');
+    (data||[]).forEach(r=>{
+      try{
+        if(r.key==='features') HARFAA_FEATURES = JSON.parse(r.value||'{}');
+        if(r.key==='site') HARFAA_SITE = JSON.parse(r.value||'{}');
+      }catch(e){}
+    });
+    applyHarfaaSettings();
+  }catch(e){ console.log('settings error', e); }
+}
+
+function isFeatureOn(key){
+  const mapped = FEATURE_MAP[key] || key;
+  if(HARFAA_FEATURES[mapped] === false) return false;
+  return true;
+}
+
+function applyHarfaaSettings(){
+  // 1. اخفي المميزات المقفولة من القايمة الجانبية
+  document.querySelectorAll('#menuList .sideItem').forEach(item=>{
+    const onclick = item.getAttribute('onclick')||'';
+    const m = onclick.match(/openFeature\('([^']+)'\)/);
+    if(m && !isFeatureOn(m[1])) item.style.display='none';
+    else item.style.display='';
+  });
+  // 2. التلج
+  const snowEls = document.querySelectorAll('.snow, #snow, [class*="snow"]');
+  if(HARFAA_FEATURES['snow']===false) snowEls.forEach(e=>e.style.display='none');
+  // 3. عرض البندل
+  if(HARFAA_FEATURES['bundle']===false){
+    document.querySelectorAll('*').forEach(el=>{
+      if(el.textContent && el.textContent.includes('اشتري 2 وخد التالت')) el.style.display='none';
+    });
+  }
+  // 4. اعدادات الموقع
+  if(HARFAA_SITE.banner){
+    document.querySelectorAll('*').forEach(el=>{
+      if(el.children.length===0 && el.textContent.includes('اشتري 2')) el.textContent = HARFAA_SITE.banner;
+    });
+  }
+  if(HARFAA_SITE.footer){
+    document.querySelectorAll('footer, .footer').forEach(e=>{ e.innerHTML = HARFAA_SITE.footer; });
+  }
+}
+
+// امنع فتح ميزة مقفولة
+const _oldOpenFeature = window.openFeature;
+window.openFeature = function(key){
+  if(!isFeatureOn(key)){
+    if(typeof toast==='function') toast('الميزة دي مش متاحة دلوقتي ❌');
+    else alert('الميزة دي مش متاحة دلوقتي');
+    return;
+  }
+  if(_oldOpenFeature) return _oldOpenFeature(key);
+}
+
+// شغل تحميل الاعدادات اول ما الصفحة تفتح
+loadHarfaaSettings();
 let supaProducts=null,supaCategories=[];
 function aiImage(color,cat){let map={'اسود':'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80','ابيض':'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&q=80','اخضر':'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80','نبيتي':'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=800&q=80','وردي':'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800&q=80','بيج':'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80'};if(cat==='Hoodies')return 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80';return map[color]||map['اسود'];}
 let cart=[];let sel={};let selSize={};let selColor={};let favs=JSON.parse(localStorage.getItem('harfaa_favs')||'[]');let points=parseInt(localStorage.getItem('harfaa_points')||'120');let coins=parseInt(localStorage.getItem('harfaa_coins')||'85');let proofUploaded=false;let proofName='';let leaguePoints=parseInt(localStorage.getItem('harfaa_league')||'320');let heroIndex=0;let heroSize='S';let isOrdering=false;let refBalance=parseInt(localStorage.getItem('harfaa_ref')||'0');
