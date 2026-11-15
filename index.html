@@ -134,20 +134,6 @@ const shipCairo = parseInt(S.ship_price || S.shipping_cairo || S.shipping || S.c
 
   // غير اي نص في الموقع فيه الشحن المجاني القديم
     // اصلاح شامل: يمشي على كل كلمة في الصفحة حتى لو جوه عناصر كتير
-const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode(node){ const p=node.parentNode; if(!p) return NodeFilter.FILTER_REJECT; const t=p.tagName; if(t==='SCRIPT'||t==='STYLE') return NodeFilter.FILTER_REJECT; return NodeFilter.FILTER_ACCEPT; } });
-  let node;
-  while(node = walker.nextNode()){
-    if(!node.nodeValue) continue;
-    if(freeLimit && node.nodeValue.includes('شحن مجاني') && node.nodeValue.includes('800')){
-      node.nodeValue = node.nodeValue.replace(/800/g, String(freeLimit));
-    }
-    if(S.banner && node.nodeValue.includes('اشتري 2')){
-      node.nodeValue = S.banner;
-    }
-    if(S.whatsapp && node.nodeValue.includes('01116887418')){
-      node.nodeValue = node.nodeValue.replace(/01116887418/g, S.whatsapp);
-    }
-  }
 
   if(S.footer){
     document.querySelectorAll('footer, .footer').forEach(e=>{ e.innerHTML = S.footer; });
