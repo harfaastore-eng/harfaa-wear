@@ -133,20 +133,21 @@ function applyHarfaaSettings(){
   if(shipOther) window.HARFAA_SHIP_OTHER = shipOther;
 
   // غير اي نص في الموقع فيه الشحن المجاني القديم
-  document.querySelectorAll('*').forEach(el=>{
-    if(el.children.length===0 && el.textContent){
-      let t = el.textContent;
-      if(freeLimit && t.includes('شحن مجاني') && t.includes('800')){
-        el.textContent = t.replace(/800/g, String(freeLimit));
-      }
-      if(S.banner && t.includes('اشتري 2')){
-        el.textContent = S.banner;
-      }
-      if(S.whatsapp && t.includes('01116887418')){
-        el.textContent = t.replace(/01116887418/g, S.whatsapp);
-      }
+    // اصلاح شامل: يمشي على كل كلمة في الصفحة حتى لو جوه عناصر كتير
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let node;
+  while(node = walker.nextNode()){
+    if(!node.nodeValue) continue;
+    if(freeLimit && node.nodeValue.includes('شحن مجاني') && node.nodeValue.includes('800')){
+      node.nodeValue = node.nodeValue.replace(/800/g, String(freeLimit));
     }
-  });
+    if(S.banner && node.nodeValue.includes('اشتري 2')){
+      node.nodeValue = S.banner;
+    }
+    if(S.whatsapp && node.nodeValue.includes('01116887418')){
+      node.nodeValue = node.nodeValue.replace(/01116887418/g, S.whatsapp);
+    }
+  }
 
   if(S.footer){
     document.querySelectorAll('footer, .footer').forEach(e=>{ e.innerHTML = S.footer; });
