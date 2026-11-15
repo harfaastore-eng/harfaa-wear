@@ -123,9 +123,9 @@ function applyHarfaaSettings(){
   // 2. اعدادات الموقع - دي اللي كانت ناقصة
   const S = HARFAA_SITE || {};
   // S دي فيها اللي الادمن بيحفظه: banner, shipping, free_shipping, whatsapp, vodafone, instapay
-  const freeLimit = parseInt(S.free_shipping || S.freeShipping || S.free || 0);
   const freeLimit = parseInt(S.free_ship || S.free_shipping || S.freeShipping || S.free || 0);
 const shipCairo = parseInt(S.ship_price || S.shipping_cairo || S.shipping || S.cairo || 0);
+  const shipOther = parseInt(S.ship_other || 90);
 
   // خزنهم في متغير عام عشان صفحة الدفع تستخدمهم
   if(freeLimit) window.HARFAA_FREE_LIMIT = freeLimit;
