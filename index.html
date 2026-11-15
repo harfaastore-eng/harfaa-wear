@@ -134,7 +134,7 @@ const shipCairo = parseInt(S.ship_price || S.shipping_cairo || S.shipping || S.c
 
   // غير اي نص في الموقع فيه الشحن المجاني القديم
     // اصلاح شامل: يمشي على كل كلمة في الصفحة حتى لو جوه عناصر كتير
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode(node){ const p=node.parentNode; if(!p) return NodeFilter.FILTER_REJECT; const t=p.tagName; if(t==='SCRIPT'||t==='STYLE') return NodeFilter.FILTER_REJECT; return NodeFilter.FILTER_ACCEPT; } });
   let node;
   while(node = walker.nextNode()){
     if(!node.nodeValue) continue;
