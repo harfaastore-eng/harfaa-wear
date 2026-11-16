@@ -1,16 +1,18 @@
-// Harfaa Admin Fix - Add Banner & Video fields
+// Harfaa Admin Fix V2 - Banner + Video URL + Upload from phone
 (function(){
   function init(){
     if(document.getElementById('harfaa-admin-extra')) return;
     var box=document.createElement('div');
     box.id='harfaa-admin-extra';
-    box.style.cssText='background:#111;border:2px solid #ff3b30;border-radius:16px;padding:16px;margin:16px;color:#fff;font-family:inherit';
+    box.style.cssText='background:#111;border:2px solid #ff3b30;border-radius:16px;padding:16px;margin:16px;color:#fff';
     box.innerHTML=
       '<h3 style="margin:0 0 12px">🔥 إعدادات البانر والفيديو - Harfaa</h3>'+
       '<label>نص البانر</label><textarea id="hf-banner" rows="2" style="width:100%;padding:10px;border-radius:10px;margin:6px 0 10px;color:#000"></textarea>'+
-      '<label>زرار البانر (مثال: اطلب دلوقتي)</label><input id="hf-banner-btn" style="width:100%;padding:10px;border-radius:10px;margin:6px 0 10px;color:#000" />'+
+      '<label>زرار البانر</label><input id="hf-banner-btn" style="width:100%;padding:10px;border-radius:10px;margin:6px 0 10px;color:#000" />'+
       '<label>لينك زرار البانر</label><input id="hf-banner-link" placeholder="https://..." style="width:100%;padding:10px;border-radius:10px;margin:6px 0 10px;color:#000" />'+
       '<label>لينك الفيديو (يوتيوب أو mp4)</label><input id="hf-video-url" placeholder="https://youtube.com/..." style="width:100%;padding:10px;border-radius:10px;margin:6px 0 10px;color:#000" />'+
+      '<label>أو اختار فيديو من تليفونك 📱</label><input type="file" id="hf-video-file" accept="video/*" style="width:100%;padding:10px;background:#fff;border-radius:10px;margin:6px 0 10px;color:#000" />'+
+      '<div id="hf-upload-msg" style="font-size:13px;color:#FFD700;margin-bottom:10px"></div>'+
       '<label>عنوان الفيديو</label><input id="hf-video-title" style="width:100%;padding:10px;border-radius:10px;margin:6px 0 10px;color:#000" />'+
       '<label style="display:flex;gap:8px;align-items:center;margin:6px 0"><input type="checkbox" id="hf-banner-show" checked> إظهار البانر</label>'+
       '<label style="display:flex;gap:8px;align-items:center;margin:6px 0 12px"><input type="checkbox" id="hf-video-show" checked> إظهار الفيديو</label>'+
@@ -18,16 +20,27 @@
       '<div id="hf-msg" style="margin-top:10px;font-size:13px;color:#7CFC00"></div>';
     document.body.prepend(box);
 
+    document.getElementById('hf-video-file').addEventListener('change', async function(e){
+      var file=e.target.files[0]; if(!file) return;
+      var umsg=document.getElementById('hf-upload-msg'); umsg.textContent='جاري رفع الفيديو... استنى متقفلهاش';
+      try{
+        var client=window.sb; if(!client) throw new Error('مفيش اتصال Supabase');
+        var name=Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+        var up=await client.storage.from('videos').upload(name, file, {cacheControl:'3600', upsert:true});
+        if(up.error) throw up.error;
+        var pub=client.storage.from('videos').getPublicUrl(name);
+        document.getElementById('hf-video-url').value=pub.data.publicUrl;
+        umsg.textContent='✅ اترفع! دوس حفظ البانر والفيديو عشان يظهر في الموقع';
+      }catch(err){ umsg.textContent='❌ مش عارف ارفع: '+(err.message||err)+' - اتأكد انك عملت bucket اسمه videos و Public'; }
+    });
+
     async function load(){
       try{
         var client=window.sb; if(!client) return;
         var res=await client.from('store_settings').select('*').limit(1).maybeSingle();
-        var row=res&&res.data?res.data:null;
-        if(!row) return;
+        var row=res&&res.data?res.data:null; if(!row) return;
         var S=row; for(var k in row){ if(row[k]&&typeof row[k]==='object'&&row[k].banner!==undefined) S=row[k]; if(typeof row[k]==='string'&&row[k].trim().startsWith('{')){ try{ var o=JSON.parse(row[k]); if(o.banner!==undefined) S=o; }catch(e){} } }
-        window._hfRowId=row.id;
-        window._hfRowKey=null;
-        for(var k2 in row){ if(typeof row[k2]==='string'&&row[k2].trim().startsWith('{')) window._hfRowKey=k2; if(row[k2]&&typeof row[k2]==='object') window._hfRowKey=k2; }
+        window._hfRowKey=null; for(var k2 in row){ if(typeof row[k2]==='string'&&row[k2].trim().startsWith('{')) window._hfRowKey=k2; if(row[k2]&&typeof row[k2]==='object') window._hfRowKey=k2; }
         document.getElementById('hf-banner').value=S.banner||'';
         document.getElementById('hf-banner-btn').value=S.banner_btn||'';
         document.getElementById('hf-banner-link').value=S.banner_link||'';
@@ -41,9 +54,9 @@
     document.getElementById('hf-save').onclick=async function(){
       var msg=document.getElementById('hf-msg'); msg.textContent='جاري الحفظ...';
       try{
-        var client=window.sb; if(!client){ msg.textContent='مش لاقي اتصال Supabase، اعمل Refresh'; return; }
+        var client=window.sb; if(!client){ msg.textContent='مش لاقي اتصال Supabase'; return; }
         var res=await client.from('store_settings').select('*').limit(1).maybeSingle();
-        var row=res&&res.data?res.data:null; if(!row){ msg.textContent='مفيش صف إعدادات في store_settings'; return; }
+        var row=res&&res.data?res.data:null; if(!row){ msg.textContent='مفيش صف إعدادات'; return; }
         var S={}; for(var k in row){ if(row[k]&&typeof row[k]==='object') S=row[k]; if(typeof row[k]==='string'&&row[k].trim().startsWith('{')){ try{S=JSON.parse(row[k]);}catch(e){} } }
         S.banner=document.getElementById('hf-banner').value;
         S.banner_btn=document.getElementById('hf-banner-btn').value;
@@ -52,11 +65,10 @@
         S.video_title=document.getElementById('hf-video-title').value;
         S.banner_show=document.getElementById('hf-banner-show').checked;
         S.video_show=document.getElementById('hf-video-show').checked;
-        var key=window._hfRowKey;
-        var payload={}; if(key) payload[key]=JSON.stringify(S); else payload=S;
+        var key=window._hfRowKey; var payload={}; if(key) payload[key]=JSON.stringify(S); else payload=S;
         var upd=await client.from('store_settings').update(payload).eq('id',row.id);
         if(upd.error) throw upd.error;
-        msg.textContent='✅ اتحفظ! افتح الموقع واعمل Refresh وهتلاقي البانر والفيديو اتغيروا';
+        msg.textContent='✅ اتحفظ! افتح الموقع واعمل Refresh';
       }catch(e){ msg.textContent='خطأ: '+(e.message||e); }
     };
   }
