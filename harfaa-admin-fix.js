@@ -1,4 +1,4 @@
-// Harfaa Admin Fix V2 - Banner + Video URL + Upload from phone
+// Harfaa Admin Fix V3 - Banner + Video - Optimized
 (function(){
   function init(){
     if(document.getElementById('harfaa-admin-extra')) return;
@@ -20,11 +20,25 @@
       '<div id="hf-msg" style="margin-top:10px;font-size:13px;color:#7CFC00"></div>';
     document.body.prepend(box);
 
+    function getClient(){
+      return window.sb || window.supabaseClient || null;
+    }
+    // استنى Supabase يجهز، وحاول 10 مرات
+    async function waitForClient(){
+      for(var i=0;i<10;i++){
+        var c = getClient();
+        if(c) return c;
+        await new Promise(r=>setTimeout(r,500));
+      }
+      return null;
+    }
+
     document.getElementById('hf-video-file').addEventListener('change', async function(e){
       var file=e.target.files[0]; if(!file) return;
       var umsg=document.getElementById('hf-upload-msg'); umsg.textContent='جاري رفع الفيديو... استنى متقفلهاش';
       try{
-        var client=window.sb; if(!client) throw new Error('مفيش اتصال Supabase');
+        var client=await waitForClient(); if(!client) throw new Error('مفيش اتصال Supabase - اعمل Refresh');
+        if(file.size > 50*1024*1024) throw new Error('الفيديو اكبر من 50 ميجا، صغره الاول');
         var name=Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
         var up=await client.storage.from('videos').upload(name, file, {cacheControl:'3600', upsert:true});
         if(up.error) throw up.error;
@@ -34,11 +48,15 @@
       }catch(err){ umsg.textContent='❌ مش عارف ارفع: '+(err.message||err)+' - اتأكد انك عملت bucket اسمه videos و Public'; }
     });
 
+    var cachedRow = null;
     async function load(){
       try{
-        var client=window.sb; if(!client) return;
+        var client=await waitForClient(); if(!client) return;
+        document.getElementById('hf-msg').textContent='جاري تحميل الإعدادات...';
         var res=await client.from('store_settings').select('*').limit(1).maybeSingle();
-        var row=res&&res.data?res.data:null; if(!row) return;
+        if(res.error) throw res.error;
+        var row=res&&res.data?res.data:null; if(!row){ document.getElementById('hf-msg').textContent='مفيش صف إعدادات'; return; }
+        cachedRow = row;
         var S=row; for(var k in row){ if(row[k]&&typeof row[k]==='object'&&row[k].banner!==undefined) S=row[k]; if(typeof row[k]==='string'&&row[k].trim().startsWith('{')){ try{ var o=JSON.parse(row[k]); if(o.banner!==undefined) S=o; }catch(e){} } }
         window._hfRowKey=null; for(var k2 in row){ if(typeof row[k2]==='string'&&row[k2].trim().startsWith('{')) window._hfRowKey=k2; if(row[k2]&&typeof row[k2]==='object') window._hfRowKey=k2; }
         document.getElementById('hf-banner').value=S.banner||'';
@@ -48,15 +66,21 @@
         document.getElementById('hf-video-title').value=S.video_title||'';
         document.getElementById('hf-banner-show').checked=S.banner_show!==false;
         document.getElementById('hf-video-show').checked=S.video_show!==false;
-      }catch(e){}
+        document.getElementById('hf-msg').textContent='';
+      }catch(e){ document.getElementById('hf-msg').textContent='خطأ تحميل: '+(e.message||e); }
     }
     load();
     document.getElementById('hf-save').onclick=async function(){
       var msg=document.getElementById('hf-msg'); msg.textContent='جاري الحفظ...';
       try{
-        var client=window.sb; if(!client){ msg.textContent='مش لاقي اتصال Supabase'; return; }
-        var res=await client.from('store_settings').select('*').limit(1).maybeSingle();
-        var row=res&&res.data?res.data:null; if(!row){ msg.textContent='مفيش صف إعدادات'; return; }
+        var client=await waitForClient(); if(!client){ msg.textContent='مش لاقي اتصال Supabase - اعمل Refresh'; return; }
+        var row = cachedRow;
+        if(!row){
+          var res=await client.from('store_settings').select('*').limit(1).maybeSingle();
+          if(res.error) throw res.error;
+          row=res&&res.data?res.data:null;
+        }
+        if(!row){ msg.textContent='مفيش صف إعدادات'; return; }
         var S={}; for(var k in row){ if(row[k]&&typeof row[k]==='object') S=row[k]; if(typeof row[k]==='string'&&row[k].trim().startsWith('{')){ try{S=JSON.parse(row[k]);}catch(e){} } }
         S.banner=document.getElementById('hf-banner').value;
         S.banner_btn=document.getElementById('hf-banner-btn').value;
