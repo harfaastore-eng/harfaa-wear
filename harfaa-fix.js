@@ -1,4 +1,4 @@
-// Harfaa Fix V2 - Fetch directly from Supabase + Hide old hardcoded banner
+// Harfaa Fix V3 - Optimized: Cache + No Polling Hell
 (function(){
   function parseSettings(row){
     if(!row) return null;
@@ -13,20 +13,33 @@
   }
   function rgbToHex(r,g,b){return '#'+[r,g,b].map(n=>Math.max(0,Math.min(255,Math.round(n))).toString(16).padStart(2,'0')).join('');}
   function isLight(hex){let h=(hex||'#111').replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');let r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);return (0.299*r+0.587*g+0.114*b)/255>0.6;}
+
+  // 1- Cache: احفظ اللون مرة واحدة، متحسبهوش كل مرة
   function getColor(url,fallback,cb){
     if(!url) return cb(fallback);
+    var cacheKey = 'harfaa_color_' + url;
+    try{
+      var cached = sessionStorage.getItem(cacheKey);
+      if(cached) return cb(cached);
+    }catch(e){}
     var img=new Image(); img.crossOrigin='Anonymous'; img.src=url;
+    var done=false;
+    function finish(c){ if(done) return; done=true; try{ sessionStorage.setItem(cacheKey,c); }catch(e){} cb(c); }
     img.onload=function(){ try{
-      var c=document.createElement('canvas'); c.width=60; c.height=60;
-      var x=c.getContext('2d'); x.drawImage(img,0,0,60,60);
-      var d=x.getImageData(0,0,60,60).data; var r=0,g=0,b=0,n=0;
-      for(var i=0;i<d.length;i+=16){var pr=d[i],pg=d[i+1],pb=d[i+2],pa=d[i+3]; if(pa<200)continue; if(pr>245&&pg>245&&pb>245)continue; if(pr<8&&pg<8&&pb<8)continue; r+=pr;g+=pg;b+=pb;n++;}
-      if(!n) return cb(fallback); cb(rgbToHex(r/n,g/n,b/n));
-    }catch(e){ cb(fallback); } };
-    img.onerror=function(){ cb(fallback); };
-    setTimeout(function(){ cb(fallback); },2500);
+      var c=document.createElement('canvas'); c.width=40; c.height=40;
+      var x=c.getContext('2d',{willReadFrequently:true}); x.drawImage(img,0,0,40,40);
+      var d=x.getImageData(0,0,40,40).data; var r=0,g=0,b=0,n=0;
+      for(var i=0;i<d.length;i+=32){var pr=d[i],pg=d[i+1],pb=d[i+2],pa=d[i+3]; if(pa<200)continue; if(pr>245&&pg>245&&pb>245)continue; if(pr<8&&pg<8&&pb<8)continue; r+=pr;g+=pg;b+=pb;n++;}
+      if(!n) return finish(fallback); finish(rgbToHex(r/n,g/n,b/n));
+    }catch(e){ finish(fallback); } };
+    img.onerror=function(){ finish(fallback); };
+    setTimeout(function(){ finish(fallback); },1500);
   }
+
+  // 2- اخفي البانر القديم مرة واحدة بس، مش كل 3 ثواني
+  var bannersHidden = false;
   function hideOldBanners(){
+    if(bannersHidden) return; bannersHidden = true;
     document.querySelectorAll('div,section,header').forEach(function(el){
       var t=(el.textContent||'');
       if(el.children.length<3 && (t.includes('HARFAA10') || t.includes('WINTER DROP') || t.includes('عرض اشتري 2'))){
@@ -34,8 +47,13 @@
       }
     });
   }
+
+  var lastSettingsJson = '';
   function apply(S){
     if(!S) return;
+    var json = JSON.stringify(S);
+    if(json === lastSettingsJson) return; // لو مفيش تغيير، متعملش حاجة
+    lastSettingsJson = json;
     window.HARFAA_SITE=S;
     hideOldBanners();
     var header=document.querySelector('header');
@@ -61,8 +79,8 @@
           if(src.includes('youtube.com')||src.includes('youtu.be')||src.includes('/embed/')){
             var id=src.includes('v=')?src.split('v=')[1].split('&')[0]:src.split('/').pop().split('?')[0];
             if(src.includes('/embed/')) id=src.split('/embed/')[1].split('?')[0];
-            media='<iframe src="https://www.youtube.com/embed/'+id+'" style="width:100%;height:220px;border:0" allowfullscreen></iframe>';
-          } else { media='<video controls playsinline loop muted style="width:100%;display:block"><source src="'+src+'" type="video/mp4"></video>'; }
+            media='<iframe loading="lazy" src="https://www.youtube.com/embed/'+id+'" style="width:100%;height:220px;border:0" allowfullscreen></iframe>';
+          } else { media='<video controls playsinline loop muted preload="none" style="width:100%;display:block"><source src="'+src+'" type="video/mp4"></video>'; }
           vb.innerHTML=media+'<div style="padding:14px"><b></b></div>';
           vb.querySelector('b').textContent=S.video_title||'🎬 شوف التيشيرت على الطبيعة';
         }
@@ -80,6 +98,7 @@
       });
     }
   }
+
   async function fetchSettings(){
     try{
       var client=window.sb || window.supabaseClient;
@@ -91,6 +110,11 @@
       if(res2 && res2.data) apply(parseSettings(res2.data));
     }catch(e){}
   }
-  setInterval(function(){ fetchSettings(); if(window.HARFAA_SITE) apply(window.HARFAA_SITE); },3000);
+
+  // 3- اهم تعديل: بدل كل 3 ثواني، خليها كل 60 ثانية، ووقف لما الصفحة مش ظاهرة
   fetchSettings();
+  setInterval(function(){
+    if(document.hidden) return; // لو المستخدم ساب الصفحة، متحملش على الفاضي
+    fetchSettings();
+  },60000);
 })();
