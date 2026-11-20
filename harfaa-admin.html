@@ -22,18 +22,17 @@ label{font-size:13px;color:#aaa}
 .switch{position:relative;width:52px;height:28px;background:#333;border-radius:20px;cursor:pointer;flex-shrink:0}
 .switch.on{background:#2e7d32} .switch:after{content:'';position:absolute;top:4px;left:4px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.2s}
 .switch.on:after{left:28px}
+.vrow{background:#1e1e1e;border:1px solid #333;border-radius:12px;padding:10px;margin:6px 0}
 </style>
 </head>
 <body>
 <h1>👑 HARFAA ADMIN</h1>
-
 <div id="loginBox" class="card">
 <h2>دخول الادمن</h2>
 <input type="password" id="passInput" placeholder="اكتب باسورد الادمن">
 <button class="btn" onclick="login()">دخول</button>
 <p id="loginMsg" style="color:#ff3b30"></p>
 </div>
-
 <div id="adminBox" class="hidden">
 <div class="tabs">
 <button id="t1" class="active" onclick="showTab('productsTab')">📦 المنتجات</button>
@@ -42,13 +41,11 @@ label{font-size:13px;color:#aaa}
 <button id="t4" onclick="showTab('ordersTab')">📦 الطلبات</button>
 <button id="t5" onclick="showTab('passTab')">🔐 الباسورد</button>
 </div>
-
 <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
 <div class="stat"><div id="stCount">0</div><small>منتج</small></div>
 <div class="stat"><div id="stAvg">0</div><small>متوسط السعر</small></div>
 <div class="stat"><div id="stNew">-</div><small>اخر منتج</small></div>
 </div>
-
 <div id="productsTab">
 <div class="card">
 <h3 id="formTitle">➕ اضافة منتج جديد</h3>
@@ -65,20 +62,23 @@ label{font-size:13px;color:#aaa}
 <label>الشحن</label><textarea id="f_shipping" placeholder="شحن لكل المحافظات خلال 2-4 ايام"></textarea>
 <label>الريفيوز</label><textarea id="f_reviews" placeholder="تقييم العملاء ..."></textarea>
 <label><input type="checkbox" id="f_featured" style="width:auto"> ⭐ منتج مميز يظهر اول واحد</label>
+<hr style="border-color:#333">
+<h3 style="margin:0">🎨 الوان المنتج - كل لون بصورته</h3>
+<p style="color:#888;font-size:12px;margin:4px 0">مثال: Double Zip Hoodie هتحط هنا 10 الوان، كل لون بلينك صورته. العميل هيدوس على اللون، الصورة هتتغير.</p>
+<div id="variantsBox"></div>
+<button type="button" class="btn3" style="width:100%" onclick="addVariantRow()">+ اضف لون</button>
+<hr style="border-color:#333">
 <div class="flex"><button class="btn" onclick="saveProduct()">💾 حفظ المنتج</button><button class="btn2" onclick="resetForm()">الغاء</button></div>
 <p id="msg"></p>
 </div>
 <div class="card"><input id="search" placeholder="🔍 ابحث في المنتجات..." oninput="render()"><div id="list"></div></div>
 </div>
-
 <div id="featuresTab" class="hidden">
 <div class="card"><h3>⚙️ تحكم كامل في المميزات - ON / OFF</h3><p style="color:#888;font-size:13px">اي حاجة تقفلها هنا هتختفي من عند كل الناس، واي حاجة تفتحها هترجع عند كل الناس.</p><div id="featuresList"></div><button class="btn3" onclick="saveFeatures()">💾 حفظ المميزات للكل</button><p id="featMsg"></p></div>
 </div>
-
 <div id="ordersTab" class="hidden">
 <div class="card"><h3>📦 الطلبات</h3><button class="btn" onclick="loadOrders()">🔄 تحديث الطلبات</button><div id="ordersList" style="margin-top:12px">جارى التحميل...</div></div>
 </div>
-
 <div id="siteTab" class="hidden">
 <div class="card"><h3>🎨 شكل الموقع كله من هنا - بيسمع عند الكل</h3>
 <label>اسم الموقع</label><input id="s_name" value="Harfaa Wear">
@@ -95,7 +95,6 @@ label{font-size:13px;color:#aaa}
 <button class="btn3" onclick="saveSite()">💾 حفظ شكل الموقع للكل</button><p id="siteMsg"></p>
 </div>
 </div>
-
 <div id="passTab" class="hidden">
 <div class="card"><h3>🔐 تغيير باسورد الادمن</h3>
 <label>الباسورد القديم</label><input type="password" id="oldPass" placeholder="الباسورد الحالي">
@@ -106,7 +105,6 @@ label{font-size:13px;color:#aaa}
 </div>
 </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="harfaa-admin-fix.js"></script>
 <script>
@@ -265,6 +263,35 @@ function render(){
   <b>${p.name}</b><br>${p.price} ج ${p.old_price?' | <s>'+p.old_price+' ج</s>':''} | ${p.category||''} | مخزون: ${p.stock||0} ${p.featured?'⭐':''}
   <div class="flex" style="margin-top:8px"><button class="btn3" onclick="editProduct('${p.id}')">تعديل</button><button class="btn2" onclick="delProduct('${p.id}')">حذف</button></div></div>`).join('')||'<p>مفيش منتجات</p>';
 }
+// ===== VARIANTS =====
+let variantRows=[];
+function addVariantRow(v={}){
+  variantRows.push({color:v.color||'',color_hex:v.color_hex||'#111111',image_url:v.image_url||'',stock:v.stock ?? 20,price:v.price||''});
+  renderVariantRows();
+}
+function renderVariantRows(){
+  document.getElementById('variantsBox').innerHTML = variantRows.map((v,i)=>`
+  <div class="vrow">
+    <div class="flex"><input placeholder="اسم اللون - Black / اسود" value="${v.color||''}" oninput="variantRows[${i}].color=this.value"><input type="color" value="${v.color_hex||'#111111'}" style="max-width:60px" oninput="variantRows[${i}].color_hex=this.value"></div>
+    <input placeholder="لينك صورة اللون https://..." value="${v.image_url||''}" oninput="variantRows[${i}].image_url=this.value">
+    <div class="flex"><input type="number" placeholder="مخزون اللون" value="${v.stock??20}" oninput="variantRows[${i}].stock=this.value"><input type="number" placeholder="سعر اللون (سيبه فاضي = سعر المنتج)" value="${v.price||''}" oninput="variantRows[${i}].price=this.value"><button class="btn2" onclick="variantRows.splice(${i},1);renderVariantRows()">✖</button></div>
+  </div>`).join('') || '<p style="color:#888;font-size:12px">لسه مفيش الوان، دوس + اضف لون</p>';
+}
+renderVariantRows();
+async function loadVariants(productId){
+  variantRows=[];
+  if(!productId){ renderVariantRows(); return; }
+  const {data} = await sb.from('product_variants').select('*').eq('product_id',productId).order('created_at');
+  variantRows = (data||[]).map(v=>({color:v.color||'',color_hex:v.color_hex||'#111111',image_url:v.image_url||'',stock:v.stock??20,price:v.price||''}));
+  renderVariantRows();
+}
+async function saveVariants(productId){
+  await sb.from('product_variants').delete().eq('product_id',productId);
+  let rows = variantRows.filter(v=>v.color && v.image_url).map(v=>({product_id:productId,color:v.color,color_hex:v.color_hex||'#111111',image_url:v.image_url,stock:Number(v.stock)||0,price:v.price?Number(v.price):null,size:'ALL'}));
+  if(!rows.length) return;
+  const {error} = await sb.from('product_variants').insert(rows);
+  if(error) alert('⚠️ المنتج اتحفظ بس الالوان فيها مشكلة: '+error.message+' - اتأكد انك عملت Policy للـ product_variants زي products');
+}
 async function editProduct(id){
   let p=allProducts.find(x=>String(x.id)===String(id)); if(!p)return;
   let {data} = await sb.from('products').select('image_url,details,shipping,reviews,sizes').eq('id',id).single();
@@ -283,9 +310,10 @@ async function editProduct(id){
   document.getElementById('f_shipping').value=p.shipping||'';
   document.getElementById('f_reviews').value=p.reviews||'';
   document.getElementById('f_featured').checked=!!p.featured;
+  await loadVariants(p.id);
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function resetForm(){document.getElementById('editId').value='';document.getElementById('formTitle').innerText='➕ اضافة منتج جديد';['f_name','f_price','f_old','f_image','f_details','f_shipping','f_reviews'].forEach(i=>document.getElementById(i).value='');document.getElementById('f_stock').value=20;document.getElementById('f_sizes').value='S - M - L - XL - 2XL - 3XL - 4XL';document.getElementById('f_featured').checked=false;document.getElementById('preview').style.display='none'}
+function resetForm(){document.getElementById('editId').value='';document.getElementById('formTitle').innerText='➕ اضافة منتج جديد';['f_name','f_price','f_old','f_image','f_details','f_shipping','f_reviews'].forEach(i=>document.getElementById(i).value='');document.getElementById('f_stock').value=20;document.getElementById('f_sizes').value='S - M - L - XL - 2XL - 3XL - 4XL';document.getElementById('f_featured').checked=false;document.getElementById('preview').style.display='none';variantRows=[];renderVariantRows();}
 document.getElementById('f_file').addEventListener('change',e=>{
   let f=e.target.files[0]; if(!f)return; let r=new FileReader(); r.onload=ev=>{document.getElementById('f_image').value=ev.target.result; let pr=document.getElementById('preview'); pr.src=ev.target.result; pr.style.display='block';}; r.readAsDataURL(f);
 });
@@ -294,12 +322,14 @@ async function saveProduct(){
   if(!name||!price){document.getElementById('msg').innerText='❌ اكتب الاسم والسعر';return}
   document.getElementById('msg').innerText='جارى الحفظ...';
   let obj={name,price,old_price:Number(document.getElementById('f_old').value)||null,image_url:document.getElementById('f_image').value||null,category:document.getElementById('f_cat').value,sizes:document.getElementById('f_sizes').value.split('-').map(s=>s.trim()).filter(Boolean),stock:Number(document.getElementById('f_stock').value)||0,details:document.getElementById('f_details').value,shipping:document.getElementById('f_shipping').value,reviews:document.getElementById('f_reviews').value,featured:document.getElementById('f_featured').checked};
-  let id=document.getElementById('editId').value; let res;
-  if(id) res=await sb.from('products').update(obj).eq('id',id); else res=await sb.from('products').insert([obj]);
+  let id=document.getElementById('editId').value; let productId=id; let res;
+  if(id){ res=await sb.from('products').update(obj).eq('id',id); }
+  else { res=await sb.from('products').insert([obj]).select().single(); if(res.data) productId=res.data.id; }
   if(res.error){document.getElementById('msg').innerText='❌ خطأ: '+res.error.message;return}
+  if(productId) await saveVariants(productId);
   document.getElementById('msg').innerText='✅ اتحفظ بنجاح!'; resetForm(); loadAll();
 }
-async function delProduct(id){if(!confirm('متأكد تحذف المنتج ده؟'))return; await sb.from('products').delete().eq('id',id); loadAll();}
+async function delProduct(id){if(!confirm('متأكد تحذف المنتج ده؟'))return; await sb.from('product_variants').delete().eq('product_id',id); await sb.from('products').delete().eq('id',id); loadAll();}
 async function saveSite(){
   let s={name:document.getElementById('s_name').value,banner:document.getElementById('s_banner').value,color:document.getElementById('s_color').value,ship_price:document.getElementById('s_ship_price').value,free_ship:document.getElementById('s_free_ship').value,whats:document.getElementById('s_whats').value,vodafone:document.getElementById('s_vodafone').value,instapay:document.getElementById('s_instapay').value,insta:document.getElementById('s_insta').value,tiktok:document.getElementById('s_tiktok').value,footer:document.getElementById('s_footer').value};
   const {error} = await sb.from('harfaa_settings').upsert([{key:'site', value: JSON.stringify(s)}],{onConflict:'key'});
