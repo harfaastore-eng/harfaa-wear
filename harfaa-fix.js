@@ -1,4 +1,4 @@
-// Harfaa Fix V3 - Optimized: Cache + No Polling Hell
+// Harfaa Fix V4 - Optimized: Cache + Countdown + Bundle + Free Shipping
 (function(){
   function parseSettings(row){
     if(!row) return null;
@@ -14,7 +14,6 @@
   function rgbToHex(r,g,b){return '#'+[r,g,b].map(n=>Math.max(0,Math.min(255,Math.round(n))).toString(16).padStart(2,'0')).join('');}
   function isLight(hex){let h=(hex||'#111').replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');let r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);return (0.299*r+0.587*g+0.114*b)/255>0.6;}
 
-  // 1- Cache: احفظ اللون مرة واحدة، متحسبهوش كل مرة
   function getColor(url,fallback,cb){
     if(!url) return cb(fallback);
     var cacheKey = 'harfaa_color_' + url;
@@ -36,7 +35,6 @@
     setTimeout(function(){ finish(fallback); },1500);
   }
 
-  // 2- اخفي البانر القديم مرة واحدة بس، مش كل 3 ثواني
   var bannersHidden = false;
   function hideOldBanners(){
     if(bannersHidden) return; bannersHidden = true;
@@ -48,14 +46,36 @@
     });
   }
 
+  // ===== العداد الحي - يشتغل مرة واحدة بس =====
+  function startCountdownTimer(){
+    if(window._harfaaCountdownStarted) return;
+    window._harfaaCountdownStarted = true;
+    setInterval(function(){
+      var el = document.getElementById('countdown-timer') || document.querySelector('.countdown-timer');
+      if(!el || !window.HARFAA_COUNTDOWN_END) return;
+      var end = new Date(window.HARFAA_COUNTDOWN_END).getTime();
+      if(isNaN(end)) return;
+      var diff = end - Date.now();
+      if(diff <= 0){ el.textContent = "00 : 00 : 00 : 00"; return; }
+      var d = Math.floor(diff / 86400000);
+      var h = Math.floor((diff % 86400000) / 3600000);
+      var m = Math.floor((diff % 3600000) / 60000);
+      var s = Math.floor((diff % 60000) / 1000);
+      el.textContent = String(d).padStart(2,'0') + ' : ' + String(h).padStart(2,'0') + ' : ' + String(m).padStart(2,'0') + ' : ' + String(s).padStart(2,'0');
+    }, 1000);
+  }
+
   var lastSettingsJson = '';
   function apply(S){
     if(!S) return;
     var json = JSON.stringify(S);
-    if(json === lastSettingsJson) return; // لو مفيش تغيير، متعملش حاجة
+    if(json === lastSettingsJson) return;
     lastSettingsJson = json;
     window.HARFAA_SITE=S;
     hideOldBanners();
+    startCountdownTimer();
+
+    // --- البانر العلوي (القديم - سيبه زي ما هو) ---
     var header=document.querySelector('header');
     var banner=document.getElementById('bannerBar');
     if(!banner && header){
@@ -68,6 +88,56 @@
       else if(S.banner){ banner.style.display='flex'; banner.innerHTML=''; var sp=document.createElement('span'); sp.textContent=S.banner; banner.appendChild(sp); if(S.banner_btn){var a=document.createElement('a'); a.href=S.banner_link||'#'; a.target='_blank'; a.textContent=S.banner_btn; a.style.cssText='background:#fff;color:#000;padding:6px 14px;border-radius:999px;text-decoration:none;font-weight:900'; banner.appendChild(a);} }
       else banner.style.display='none';
     }
+
+    // ===== 1. العداد - جديد =====
+    // بيقبل countdown_enabled او countdown_show
+    var cdEnabled = (S.countdown_enabled !== undefined) ? S.countdown_enabled : S.countdown_show;
+    var cdBox = document.getElementById('countdown-box') || document.querySelector('.countdown-box');
+    if(cdBox){
+      if(cdEnabled === false) cdBox.style.display = 'none';
+      else cdBox.style.display = 'block';
+    }
+    if(S.countdown_text){
+      var ct = document.getElementById('countdown-text') || document.querySelector('.countdown-text');
+      if(ct) ct.textContent = S.countdown_text;
+    }
+    if(S.countdown_end){
+      window.HARFAA_COUNTDOWN_END = S.countdown_end;
+    }
+
+    // ===== 2. البندل - جديد =====
+    var bundleEnabled = (S.bundle_enabled !== undefined) ? S.bundle_enabled : S.bundle_show;
+    var bundleEl = document.getElementById('bundle-banner') || document.querySelector('.bundle-banner');
+    if(bundleEl){
+      if(bundleEnabled === false) bundleEl.style.display = 'none';
+      else {
+        bundleEl.style.display = 'block';
+        if(S.bundle_text) bundleEl.textContent = S.bundle_text;
+      }
+    }
+    if(S.bundle_type) window.HARFAA_BUNDLE_TYPE = S.bundle_type;
+    if(S.bundle_min_items) window.HARFAA_BUNDLE_MIN = S.bundle_min_items;
+
+    // ===== 3. الشحن المجاني - جديد =====
+    var freeShip = S.free_shipping || S.freeShippingLimit || S.freeShipping;
+    if(freeShip){
+      document.querySelectorAll('.free-shipping-limit').forEach(function(el){ el.textContent = freeShip; });
+      var bar = document.getElementById('free-shipping-bar') || document.getElementById('free-shipping-text');
+      if(bar){
+        var cartTotal = window.cartTotal || 0;
+        var rem = Number(freeShip) - Number(cartTotal);
+        if(rem > 0) bar.textContent = 'فاضلك ' + rem + 'ج وتاخد شحن مجاني';
+        else bar.textContent = 'مبروك! خدت شحن مجاني';
+      }
+      window.HARFAA_FREE_SHIPPING = Number(freeShip);
+    }
+
+    // ===== 4. اسم المتجر =====
+    if(S.store_name || S.storeName){
+      var sName = S.store_name || S.storeName;
+      document.querySelectorAll('[data-setting="storeName"]').forEach(function(el){ el.textContent = sName; });
+    }
+
     var vb=document.querySelector('.videoBox');
     if(vb){
       if(S.video_show===false || !S.video_url){ vb.style.display='none'; }
@@ -99,6 +169,18 @@
     }
   }
 
+  // ===== حساب خصم البندل في السلة - استدعيها من كود السلة بتاعك =====
+  window.applyBundleDiscount = function(cartItems){
+    var S = window.HARFAA_SITE || {};
+    var enabled = (S.bundle_enabled !== undefined) ? S.bundle_enabled : S.bundle_show;
+    if(enabled === false) return 0;
+    if(!cartItems || cartItems.length < 3) return 0;
+    var cheapest = Math.min.apply(null, cartItems.map(function(i){ return Number(i.price||0); }));
+    if(S.bundle_type === 'third_free') return cheapest;
+    if(S.bundle_type === 'third_30') return cheapest * 0.3;
+    return cheapest * 0.5; // الافتراضي: التالت بنص الثمن
+  };
+
   async function fetchSettings(){
     try{
       var client=window.sb || window.supabaseClient;
@@ -111,10 +193,9 @@
     }catch(e){}
   }
 
-  // 3- اهم تعديل: بدل كل 3 ثواني، خليها كل 60 ثانية، ووقف لما الصفحة مش ظاهرة
   fetchSettings();
   setInterval(function(){
-    if(document.hidden) return; // لو المستخدم ساب الصفحة، متحملش على الفاضي
+    if(document.hidden) return;
     fetchSettings();
   },60000);
 })();
