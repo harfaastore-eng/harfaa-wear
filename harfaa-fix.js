@@ -1,90 +1,4 @@
-// ===== Fix Scroll Jump - الصقها في اول الملف =====
-(function(){
-  var lastScroll = 0;
-  var lockUntil = 0;
-  var isColorOrProductClick = false;
-
-  // 1. احفظ مكانك قبل اي دوسة
-  document.addEventListener('click', function(e){
-    var t = e.target.closest('button, a, [data-color], .color, .swatch, .product, [onclick*="color"], [onclick*="product"]');
-    if(t){
-      lastScroll = window.scrollY;
-      isColorOrProductClick = true;
-      lockUntil = Date.now() + 1500; // اقفل السكرول 1.5 ثانية
-      // رجعك لمكانك بعد شوية
-      setTimeout(function(){ window.scrollTo(0, lastScroll); }, 50);
-      setTimeout(function(){ window.scrollTo(0, lastScroll); }, 300);
-      setTimeout(function(){ window.scrollTo(0, lastScroll); isColorOrProductClick = false; }, 800);
-    }
-  }, true);
-
-  // 2. امنع الموقع انه يطلعك فوق غصب
-  var origScrollTo = window.scrollTo;
-  window.scrollTo = function(x, y){
-    if(Date.now() < lockUntil && isColorOrProductClick){
-      // لو الموقع بيحاول يطلعك فوق وانت لسه دايس على لون او منتج، تجاهله
-      if(y === 0 || y < 100){
-        return;
-      }
-    }
-    return origScrollTo.apply(window, arguments);
-  };
-  var origScroll = window.scroll;
-  window.scroll = window.scrollTo;
-
-  // 3. امنع scrollIntoView اللي بيوديك لاخر الموقع
-  var origIntoView = Element.prototype.scrollIntoView;
-  Element.prototype.scrollIntoView = function(){
-    if(Date.now() < lockUntil && isColorOrProductClick){
-      return; // تجاهله
-    }
-    return origIntoView.apply(this, arguments);
-  };
-
-  // 4. لو الصفحة حاولت تنزل تحت لوحدها بعد فتح المنتج، رجعك لمكانك
-  var lastY = window.scrollY;
-  window.addEventListener('scroll', function(){
-    if(Date.now() < lockUntil && isColorOrProductClick){
-      var diff = Math.abs(window.scrollY - lastScroll);
-      if(diff > 400){
-        window.scrollTo(0, lastScroll);
-      }
-    }
-    lastY = window.scrollY;
-  }, { passive: true });
-})();
-// ===== Fix Color Click Closes Product - الصقها بعد قطعة السكرول =====
-(function(){
-  // امنع دوسة اللون / المقاس انها توصل للمنتج اللي فوقها
-  document.addEventListener('click', function(e){
-    var swatch = e.target.closest('[data-color], .color-dot, .color-option, .swatch, .color, [class*="color"], [class*="swatch"], [class*="Color"], input[type="radio"], label');
-    // بس لو انت جوه صفحة المنتج
-    var inDetail = e.target.closest('[class*="detail"], [class*="product-page"], [id*="detail"], [id*="product"]');
-    // لو دوست على لون او مقاس، وقف الدوسة هنا، متخليهاش تطلع لفوق
-    if(swatch){
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      // سيب الموقع يغير اللون، بس متخليهوش يقفل الصفحة
-      // هنرجع نفعل الدوسة بعد 100ms عشان اللون يلحق يتغير
-      setTimeout(function(){
-        // متعملش حاجة، بس عشان نضمن ان الصفحة مفضلتش مقفولة
-      }, 100);
-    }
-  }, true);
-
-  // كمان: لو الموقع بيقفل صفحة المنتج لما تدوس على اي حاجة جواها، امنعه
-  document.addEventListener('click', function(e){
-    var detail = document.querySelector('[class*="detail"], [id*="product-detail"]');
-    if(detail && detail.contains(e.target)){
-      var isCloseBtn = e.target.closest('[class*="close"], [class*="back"], [class*="Back"]');
-      if(!isCloseBtn){
-        // انت دوست جوه صفحة المنتج، مش على زرار الرجوع، متقفلهاش
-        e.stopPropagation();
-      }
-    }
-  }, true);
-})();
-// Harfaa Fix V10 - Inject Timer Inside Countdown Bar
+// Harfaa Fix V11 - Clean - من غير تعديل السكرول ولا اللون
 (function(){
   var HARFAA_SB_URL = "https://uuxrjiytnnxsbhymkdfd.supabase.co";
   var HARFAA_SB_KEY = "sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI";
@@ -176,23 +90,16 @@
     var s = Math.floor((diff % 60000) / 1000);
     return String(d).padStart(2,'0') + ' : ' + String(h).padStart(2,'0') + ' : ' + String(m).padStart(2,'0') + ' : ' + String(s).padStart(2,'0');
   }
-
-  // ===== ازرع التايمر جوه بار العداد =====
   function ensureTimerInjected(){
     var existing = document.getElementById('harfaa-timer-injected');
     if(existing) return existing;
-    // دور على اي عنصر فيه "بيخلص بعد" - حتى لو جواه عناصر تانية
     var all = document.querySelectorAll('*');
     var bar = null;
     for(var i=0;i<all.length;i++){
       var t = (all[i].textContent||'');
-      if(t.includes('بيخلص بعد') && all[i].children.length <= 3 && t.length < 100){
-        bar = all[i];
-        break;
-      }
+      if(t.includes('بيخلص بعد') && all[i].children.length <= 3 && t.length < 100){ bar = all[i]; break; }
     }
     if(!bar){
-      // لو ملقيتش، دور على اي عنصر فيه "عرض الشتاء"
       for(var j=0;j<all.length;j++){
         var t2 = (all[j].textContent||'');
         if(t2.includes('عرض الشتاء بيخلص') && all[j].children.length <= 3 && t2.length < 100){ bar = all[j]; break; }
@@ -200,17 +107,14 @@
     }
     if(!bar) return null;
     unhideElAndParents(bar);
-    // خلي البار يعرض التايمر تحته
     var timer = document.createElement('div');
     timer.id = 'harfaa-timer-injected';
     timer.style.cssText = 'font-weight:900;font-size:22px;text-align:center;margin-top:6px;direction:ltr;letter-spacing:2px;color:#000';
     timer.textContent = '00 : 00 : 00 : 00';
-    // لو البار نفسه هو النص، حط التايمر بعده، لو البار اب، حطه جواه
     if(bar.parentElement) bar.parentElement.appendChild(timer);
     else bar.appendChild(timer);
     return timer;
   }
-
   function startCountdownTimer(){
     if(window._harfaaCountdownStarted) return;
     window._harfaaCountdownStarted = true;
@@ -222,41 +126,26 @@
         if(old) old.style.display = 'none';
         return;
       }
-      if(!window.HARFAA_COUNTDOWN_END){
-        // العداد متفعل بس التاريخ فاضي - وري بوكس اصفر
-        var dbg = document.getElementById('harfaa-countdown-debug');
-        if(!dbg){
-          dbg = document.createElement('div');
-          dbg.id = 'harfaa-countdown-debug';
-          dbg.style.cssText = 'position:fixed;top:40px;left:0;right:0;background:#ffcc00;color:#000;font-size:13px;padding:10px;z-index:99999;text-align:center';
-          dbg.textContent = 'DEBUG: العداد متفعل بس التاريخ فاضي في الادمن - افتح الادمن وحط تاريخ 30 ودوس حفظ';
-          document.body.prepend(dbg);
-        }
-        return;
-      } else {
-        var dbg2 = document.getElementById('harfaa-countdown-debug');
-        if(dbg2) dbg2.remove();
-      }
+      if(!window.HARFAA_COUNTDOWN_END) return;
       var txt = formatCountdown(window.HARFAA_COUNTDOWN_END);
       if(!txt) return;
-      var el = ensureTimerInjected();
-      if(el){
-        el.style.display = 'block';
-        el.textContent = txt;
-        showByText(['بيخلص بعد','عرض الشتاء بيخلص']);
-      }
+      // حدث التايمر بس، متلمسش اي حاجة تانية في الصفحة
+      var el = document.getElementById('harfaa-timer-injected');
+      if(el){ el.style.display = 'block'; el.textContent = txt; }
     }, 1000);
   }
-
   var lastApplied = null;
   function apply(S, rawRow){
     if(!S) return;
+    // لو الاعدادات هي هي، متطبقش تاني عشان متقفلش صفحة المنتج
+    var sig = JSON.stringify(S);
+    if(sig === window._harfaaLastSig) return;
+    window._harfaaLastSig = sig;
     lastApplied = S;
     window.HARFAA_SITE = S;
     window.HARFAA_RAW = rawRow;
     startCountdownTimer();
     doApply(S);
-    var dbg = document.getElementById('harfaa-debug'); if(dbg) dbg.remove();
   }
   function doApply(S){
     if(!S) return;
@@ -296,7 +185,6 @@
         if(elNow){ elNow.style.display='block'; elNow.textContent = txtNow; }
       }
     } else {
-      // لو التاريخ فاضي، شيله عشان يبان البوكس الاصفر
       window.HARFAA_COUNTDOWN_END = null;
     }
     var bundleEnabled = (S.bundle_enabled !== undefined) ? S.bundle_enabled : S.bundle_show;
@@ -307,24 +195,11 @@
       var finalBundleText = getBundleText(S.bundle_type, S.bundle_text);
       var bnd = findAllByText(['عرض البندل','اشتري 2 وخد']);
       if(bnd.length) bnd[0].textContent = '🎁 ' + finalBundleText;
-      document.querySelectorAll('*').forEach(function(el){
-        if(el.children.length === 0 && (el.textContent||'').includes('بنص الثمن') && S.bundle_type === 'third_30'){
-          el.textContent = (el.textContent||'').replace('بنص الثمن','بخصم 30%').replace('نص الثمن','خصم 30%');
-        }
-        if(el.children.length === 0 && (el.textContent||'').includes('بخصم 30%') && S.bundle_type === 'third_half'){
-          el.textContent = (el.textContent||'').replace('بخصم 30%','بنص الثمن');
-        }
-      });
     }
     if(S.bundle_type) window.HARFAA_BUNDLE_TYPE = S.bundle_type;
     var freeShip = S.free_shipping || S.freeShippingLimit || S.freeShipping;
     if(freeShip){
       window.HARFAA_FREE_SHIPPING = Number(freeShip);
-      document.querySelectorAll('*').forEach(function(el){
-        if(el.children.length === 0 && (el.textContent||'').includes('2000')){
-          el.textContent = (el.textContent||'').replace(/2000/g, String(freeShip));
-        }
-      });
     }
     var vb=document.querySelector('.videoBox');
     if(vb){
@@ -396,6 +271,5 @@
       if(res2 && res2.data) apply(parseSettings(res2.data), res2.data);
     }catch(e){}
   }
-  loadSupabaseLib(function(){ fetchSettings(); setTimeout(fetchSettings, 2000); });
-  setInterval(function(){ if(lastApplied) doApply(lastApplied); if(document.hidden) return; fetchSettings(); }, 5000);
+  loadSupabaseLib(function(){ fetchSettings(); });
 })();
