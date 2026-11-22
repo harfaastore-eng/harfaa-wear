@@ -1,4 +1,4 @@
-// Harfaa Fix V7 - FINAL: Ready - URL + Key Filled
+// Harfaa Fix V8 - Fix Show Again + Bundle Type Text
 (function(){
   var HARFAA_SB_URL = "https://uuxrjiytnnxsbhymkdfd.supabase.co";
   var HARFAA_SB_KEY = "sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI";
@@ -58,6 +58,28 @@
     });
     return els.length;
   }
+  // ===== دي اللي كانت ناقصة: اظهر تاني =====
+  function showByText(keywords){
+    document.querySelectorAll('*').forEach(function(el){
+      var t = (el.textContent||'').trim();
+      for(var k=0;k<keywords.length;k++){
+        if(t.includes(keywords[k]) && el.style.display === 'none'){
+          el.style.removeProperty('display');
+        }
+      }
+    });
+  }
+  function getBundleText(type, customText){
+    // لو المستخدم كاتب نص مخصص ومفيهوش كلمة بنص او 30% او مجانا، استخدمه
+    if(customText && !customText.includes('بنص') && !customText.includes('30%') && !customText.includes('مجانا') && !customText.includes('نص الثمن')){
+      return customText;
+    }
+    // غير كده، ولّد النص من النوع اللي اختاره في الادمن
+    if(type === 'third_free') return 'عرض البندل: اشتري 2 وخد التالت مجانا!';
+    if(type === 'third_30') return 'عرض البندل: اشتري 2 وخد التالت بخصم 30%!';
+    if(type === 'third_half') return 'عرض البندل: اشتري 2 وخد التالت بنص الثمن!';
+    return customText || 'عرض البندل: اشتري 2 وخد التالت بنص الثمن!';
+  }
   function startCountdownTimer(){
     if(window._harfaaCountdownStarted) return;
     window._harfaaCountdownStarted = true;
@@ -93,25 +115,66 @@
   }
   function doApply(S){
     if(!S) return;
+    // البانر
     if(S.banner_show === false){
       hideByText(['HARFAA10','WINTER DROP']);
       var bb = document.getElementById('bannerBar'); if(bb) bb.style.setProperty('display','none','important');
+    } else {
+      showByText(['HARFAA10','WINTER DROP']);
+      var bb2 = document.getElementById('bannerBar'); if(bb2) bb2.style.removeProperty('display');
+      if(S.banner){
+        var bEls = findAllByText(['HARFAA10','WINTER DROP']);
+        if(bEls.length) bEls[0].textContent = S.banner;
+      }
     }
+
+    // ===== العداد - اظهر تاني لو متفعل =====
     var cdEnabled = (S.countdown_enabled !== undefined) ? S.countdown_enabled : S.countdown_show;
-    if(cdEnabled === false) hideByText(['بيخلص بعد','عرض الشتاء بيخلص','00 : 00 : 00']);
+    if(cdEnabled === false){
+      hideByText(['بيخلص بعد','عرض الشتاء بيخلص','00 : 00 : 00']);
+    } else {
+      showByText(['بيخلص بعد','عرض الشتاء بيخلص','00 : 00 : 00']);
+      // لو العداد كان مخفي والاب مخفي، اظهر الاب كمان
+      document.querySelectorAll('*').forEach(function(el){
+        if((el.textContent||'').includes('بيخلص بعد') && el.style.display === 'none') el.style.removeProperty('display');
+      });
+    }
     if(S.countdown_text){
       var ctEls = findAllByText(['بيخلص بعد','عرض الشتاء']);
       if(ctEls.length) ctEls[0].textContent = S.countdown_text;
     }
-    if(S.countdown_end) window.HARFAA_COUNTDOWN_END = S.countdown_end;
+    if(S.countdown_end){
+      window.HARFAA_COUNTDOWN_END = S.countdown_end;
+      // لو التاريخ من غير وقت، خليه اخر اليوم
+      if(typeof S.countdown_end === 'string' && S.countdown_end.length === 10){
+        window.HARFAA_COUNTDOWN_END = S.countdown_end + 'T23:59:59';
+      }
+    }
+
+    // ===== البندل - اظهر + غير النص على حسب النوع =====
     var bundleEnabled = (S.bundle_enabled !== undefined) ? S.bundle_enabled : S.bundle_show;
     if(bundleEnabled === false){
       hideByText(['عرض البندل','اشتري 2 وخد التالت','خد التالت بنص']);
-    } else if(S.bundle_text){
+    } else {
+      showByText(['عرض البندل','اشتري 2 وخد التالت','خد التالت بنص']);
+      var finalBundleText = getBundleText(S.bundle_type, S.bundle_text);
       var bnd = findAllByText(['عرض البندل','اشتري 2 وخد']);
-      if(bnd.length) bnd[0].textContent = '🎁 ' + S.bundle_text;
+      if(bnd.length) bnd[0].textContent = '🎁 ' + finalBundleText;
+      // لو النص القديم لسه موجود في عنصر تاني، غيره برضه
+      document.querySelectorAll('*').forEach(function(el){
+        if(el.children.length === 0 && (el.textContent||'').includes('بنص الثمن') && S.bundle_type === 'third_30'){
+          el.textContent = (el.textContent||'').replace('بنص الثمن','بخصم 30%').replace('نص الثمن','خصم 30%');
+        }
+        if(el.children.length === 0 && (el.textContent||'').includes('بخصم 30%') && S.bundle_type === 'third_half'){
+          el.textContent = (el.textContent||'').replace('بخصم 30%','بنص الثمن');
+        }
+        if(el.children.length === 0 && (el.textContent||'').includes('مجانا') && S.bundle_type === 'third_30'){
+          el.textContent = (el.textContent||'').replace('مجانا','بخصم 30%');
+        }
+      });
     }
     if(S.bundle_type) window.HARFAA_BUNDLE_TYPE = S.bundle_type;
+
     var freeShip = S.free_shipping || S.freeShippingLimit || S.freeShipping;
     if(freeShip){
       window.HARFAA_FREE_SHIPPING = Number(freeShip);
@@ -189,27 +252,12 @@
   async function fetchSettings(){
     try{
       var client = getClient();
-      if(!client){
-        var dbg = document.getElementById('harfaa-debug');
-        if(!dbg){ dbg = document.createElement('div'); dbg.id='harfaa-debug'; dbg.style.cssText='position:fixed;top:0;left:0;right:0;background:red;color:white;font-size:12px;padding:8px;z-index:99999'; document.body.prepend(dbg); }
-        dbg.textContent = 'DEBUG: لسه مفيش Supabase Client';
-        return;
-      }
+      if(!client) return;
       var res=await client.from('store_settings').select('*').limit(1).maybeSingle();
       if(res && res.data){ apply(parseSettings(res.data), res.data); return; }
-      if(res && res.error){
-        var dbg2 = document.getElementById('harfaa-debug');
-        if(!dbg2){ dbg2 = document.createElement('div'); dbg2.id='harfaa-debug'; dbg2.style.cssText='position:fixed;top:0;left:0;right:0;background:red;color:white;font-size:12px;padding:8px;z-index:99999'; document.body.prepend(dbg2); }
-        dbg2.textContent = 'DEBUG ERROR Supabase: ' + res.error.message;
-        return;
-      }
       var res2=await client.from('harfaa_settings').select('*').limit(1).maybeSingle();
       if(res2 && res2.data) apply(parseSettings(res2.data), res2.data);
-    }catch(e){
-      var dbg3 = document.getElementById('harfaa-debug');
-      if(!dbg3){ dbg3 = document.createElement('div'); dbg3.id='harfaa-debug'; dbg3.style.cssText='position:fixed;top:0;left:0;right:0;background:red;color:white;font-size:12px;padding:8px;z-index:99999'; document.body.prepend(dbg3); }
-      dbg3.textContent='DEBUG ERROR: '+(e.message||e);
-    }
+    }catch(e){}
   }
   loadSupabaseLib(function(){ fetchSettings(); setTimeout(fetchSettings, 2000); });
   setInterval(function(){ if(lastApplied) doApply(lastApplied); if(document.hidden) return; fetchSettings(); }, 5000);
