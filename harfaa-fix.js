@@ -1,3 +1,58 @@
+// ===== Fix Scroll Jump - الصقها في اول الملف =====
+(function(){
+  var lastScroll = 0;
+  var lockUntil = 0;
+  var isColorOrProductClick = false;
+
+  // 1. احفظ مكانك قبل اي دوسة
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('button, a, [data-color], .color, .swatch, .product, [onclick*="color"], [onclick*="product"]');
+    if(t){
+      lastScroll = window.scrollY;
+      isColorOrProductClick = true;
+      lockUntil = Date.now() + 1500; // اقفل السكرول 1.5 ثانية
+      // رجعك لمكانك بعد شوية
+      setTimeout(function(){ window.scrollTo(0, lastScroll); }, 50);
+      setTimeout(function(){ window.scrollTo(0, lastScroll); }, 300);
+      setTimeout(function(){ window.scrollTo(0, lastScroll); isColorOrProductClick = false; }, 800);
+    }
+  }, true);
+
+  // 2. امنع الموقع انه يطلعك فوق غصب
+  var origScrollTo = window.scrollTo;
+  window.scrollTo = function(x, y){
+    if(Date.now() < lockUntil && isColorOrProductClick){
+      // لو الموقع بيحاول يطلعك فوق وانت لسه دايس على لون او منتج، تجاهله
+      if(y === 0 || y < 100){
+        return;
+      }
+    }
+    return origScrollTo.apply(window, arguments);
+  };
+  var origScroll = window.scroll;
+  window.scroll = window.scrollTo;
+
+  // 3. امنع scrollIntoView اللي بيوديك لاخر الموقع
+  var origIntoView = Element.prototype.scrollIntoView;
+  Element.prototype.scrollIntoView = function(){
+    if(Date.now() < lockUntil && isColorOrProductClick){
+      return; // تجاهله
+    }
+    return origIntoView.apply(this, arguments);
+  };
+
+  // 4. لو الصفحة حاولت تنزل تحت لوحدها بعد فتح المنتج، رجعك لمكانك
+  var lastY = window.scrollY;
+  window.addEventListener('scroll', function(){
+    if(Date.now() < lockUntil && isColorOrProductClick){
+      var diff = Math.abs(window.scrollY - lastScroll);
+      if(diff > 400){
+        window.scrollTo(0, lastScroll);
+      }
+    }
+    lastY = window.scrollY;
+  }, { passive: true });
+})();
 // Harfaa Fix V10 - Inject Timer Inside Countdown Bar
 (function(){
   var HARFAA_SB_URL = "https://uuxrjiytnnxsbhymkdfd.supabase.co";
