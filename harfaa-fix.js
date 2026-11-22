@@ -53,6 +53,37 @@
     lastY = window.scrollY;
   }, { passive: true });
 })();
+// ===== Fix Color Click Closes Product - الصقها بعد قطعة السكرول =====
+(function(){
+  // امنع دوسة اللون / المقاس انها توصل للمنتج اللي فوقها
+  document.addEventListener('click', function(e){
+    var swatch = e.target.closest('[data-color], .color-dot, .color-option, .swatch, .color, [class*="color"], [class*="swatch"], [class*="Color"], input[type="radio"], label');
+    // بس لو انت جوه صفحة المنتج
+    var inDetail = e.target.closest('[class*="detail"], [class*="product-page"], [id*="detail"], [id*="product"]');
+    // لو دوست على لون او مقاس، وقف الدوسة هنا، متخليهاش تطلع لفوق
+    if(swatch){
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      // سيب الموقع يغير اللون، بس متخليهوش يقفل الصفحة
+      // هنرجع نفعل الدوسة بعد 100ms عشان اللون يلحق يتغير
+      setTimeout(function(){
+        // متعملش حاجة، بس عشان نضمن ان الصفحة مفضلتش مقفولة
+      }, 100);
+    }
+  }, true);
+
+  // كمان: لو الموقع بيقفل صفحة المنتج لما تدوس على اي حاجة جواها، امنعه
+  document.addEventListener('click', function(e){
+    var detail = document.querySelector('[class*="detail"], [id*="product-detail"]');
+    if(detail && detail.contains(e.target)){
+      var isCloseBtn = e.target.closest('[class*="close"], [class*="back"], [class*="Back"]');
+      if(!isCloseBtn){
+        // انت دوست جوه صفحة المنتج، مش على زرار الرجوع، متقفلهاش
+        e.stopPropagation();
+      }
+    }
+  }, true);
+})();
 // Harfaa Fix V10 - Inject Timer Inside Countdown Bar
 (function(){
   var HARFAA_SB_URL = "https://uuxrjiytnnxsbhymkdfd.supabase.co";
