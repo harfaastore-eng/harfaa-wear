@@ -1,4 +1,4 @@
-// Harfaa Fix V9 - Countdown Timer Force Show
+// Harfaa Fix V10 - Inject Timer Inside Countdown Bar
 (function(){
   var HARFAA_SB_URL = "https://uuxrjiytnnxsbhymkdfd.supabase.co";
   var HARFAA_SB_KEY = "sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI";
@@ -58,10 +58,9 @@
     });
     return els.length;
   }
-  // ===== اظهر + اظهر الاب والجد كمان - دي كانت المشكلة =====
   function unhideElAndParents(el){
     var cur = el;
-    for(var i=0;i<4 && cur && cur.tagName !== 'BODY' && cur.tagName !== 'HTML'; i++){
+    for(var i=0;i<5 && cur && cur.tagName !== 'BODY' && cur.tagName !== 'HTML'; i++){
       cur.style.removeProperty('display');
       cur = cur.parentElement;
     }
@@ -70,59 +69,16 @@
     document.querySelectorAll('*').forEach(function(el){
       var t = (el.textContent||'').trim();
       for(var k=0;k<keywords.length;k++){
-        if(t.includes(keywords[k])){
-          unhideElAndParents(el);
-        }
+        if(t.includes(keywords[k])) unhideElAndParents(el);
       }
     });
   }
   function getBundleText(type, customText){
-    if(customText && !customText.includes('بنص') && !customText.includes('30%') && !customText.includes('مجانا') && !customText.includes('نص الثمن')){
-      return customText;
-    }
+    if(customText && !customText.includes('بنص') && !customText.includes('30%') && !customText.includes('مجانا') && !customText.includes('نص الثمن')) return customText;
     if(type === 'third_free') return 'عرض البندل: اشتري 2 وخد التالت مجانا!';
     if(type === 'third_30') return 'عرض البندل: اشتري 2 وخد التالت بخصم 30%!';
     if(type === 'third_half') return 'عرض البندل: اشتري 2 وخد التالت بنص الثمن!';
     return customText || 'عرض البندل: اشتري 2 وخد التالت بنص الثمن!';
-  }
-
-  // ===== التايمر الجديد - بيدور بأي شكل =====
-  function findTimerEl(){
-    // 1. بالـ id او class
-    var byId = document.querySelector('#countdown, #timer, #countDown, .countdown, .timer, [id*="countdown" i], [class*="countdown" i], [id*="timer" i], [class*="timer" i]');
-    if(byId) return byId;
-    // 2. اي عنصر فيه شكل 00 : 00
-    var all = document.querySelectorAll('div,span,p,b,strong');
-    for(var i=0;i<all.length;i++){
-      var t = all[i].textContent||'';
-      if(/\d{1,2}\s*:\s*\d{2}\s*:\s*\d{2}/.test(t) && all[i].children.length === 0){
-        return all[i];
-      }
-    }
-    // 3. العنصر اللي جنب "بيخلص بعد" - اخوه اللي بعده
-    var label = null;
-    var all2 = document.querySelectorAll('*');
-    for(var j=0;j<all2.length;j++){
-      if((all2[j].textContent||'').includes('بيخلص بعد') && all2[j].children.length === 0){ label = all2[j]; break; }
-    }
-    if(label){
-      // دور على اخوه او ابوه فيه رقم
-      var parent = label.parentElement;
-      if(parent){
-        var spans = parent.querySelectorAll('span,div,b');
-        for(var k=0;k<spans.length;k++){
-          if(spans[k] !== label) return spans[k];
-        }
-        // لو مفيش، اعمل عنصر تايمر جديد جنبه
-        var newEl = document.createElement('div');
-        newEl.id = 'harfaa-timer-new';
-        newEl.style.cssText = 'font-weight:800;font-size:18px;text-align:center;margin-top:4px;direction:ltr';
-        newEl.textContent = '00 : 00 : 00 : 00';
-        parent.appendChild(newEl);
-        return newEl;
-      }
-    }
-    return null;
   }
   function formatCountdown(end){
     var diff = new Date(end).getTime() - Date.now();
@@ -134,21 +90,73 @@
     var s = Math.floor((diff % 60000) / 1000);
     return String(d).padStart(2,'0') + ' : ' + String(h).padStart(2,'0') + ' : ' + String(m).padStart(2,'0') + ' : ' + String(s).padStart(2,'0');
   }
+
+  // ===== ازرع التايمر جوه بار العداد =====
+  function ensureTimerInjected(){
+    var existing = document.getElementById('harfaa-timer-injected');
+    if(existing) return existing;
+    // دور على اي عنصر فيه "بيخلص بعد" - حتى لو جواه عناصر تانية
+    var all = document.querySelectorAll('*');
+    var bar = null;
+    for(var i=0;i<all.length;i++){
+      var t = (all[i].textContent||'');
+      if(t.includes('بيخلص بعد') && all[i].children.length <= 3 && t.length < 100){
+        bar = all[i];
+        break;
+      }
+    }
+    if(!bar){
+      // لو ملقيتش، دور على اي عنصر فيه "عرض الشتاء"
+      for(var j=0;j<all.length;j++){
+        var t2 = (all[j].textContent||'');
+        if(t2.includes('عرض الشتاء بيخلص') && all[j].children.length <= 3 && t2.length < 100){ bar = all[j]; break; }
+      }
+    }
+    if(!bar) return null;
+    unhideElAndParents(bar);
+    // خلي البار يعرض التايمر تحته
+    var timer = document.createElement('div');
+    timer.id = 'harfaa-timer-injected';
+    timer.style.cssText = 'font-weight:900;font-size:22px;text-align:center;margin-top:6px;direction:ltr;letter-spacing:2px;color:#000';
+    timer.textContent = '00 : 00 : 00 : 00';
+    // لو البار نفسه هو النص، حط التايمر بعده، لو البار اب، حطه جواه
+    if(bar.parentElement) bar.parentElement.appendChild(timer);
+    else bar.appendChild(timer);
+    return timer;
+  }
+
   function startCountdownTimer(){
     if(window._harfaaCountdownStarted) return;
     window._harfaaCountdownStarted = true;
     setInterval(function(){
-      if(!window.HARFAA_COUNTDOWN_END) return;
       var S = window.HARFAA_SITE || {};
       var cdEnabled = (S.countdown_enabled !== undefined) ? S.countdown_enabled : S.countdown_show;
-      if(cdEnabled === false) return;
+      if(cdEnabled === false){
+        var old = document.getElementById('harfaa-timer-injected');
+        if(old) old.style.display = 'none';
+        return;
+      }
+      if(!window.HARFAA_COUNTDOWN_END){
+        // العداد متفعل بس التاريخ فاضي - وري بوكس اصفر
+        var dbg = document.getElementById('harfaa-countdown-debug');
+        if(!dbg){
+          dbg = document.createElement('div');
+          dbg.id = 'harfaa-countdown-debug';
+          dbg.style.cssText = 'position:fixed;top:40px;left:0;right:0;background:#ffcc00;color:#000;font-size:13px;padding:10px;z-index:99999;text-align:center';
+          dbg.textContent = 'DEBUG: العداد متفعل بس التاريخ فاضي في الادمن - افتح الادمن وحط تاريخ 30 ودوس حفظ';
+          document.body.prepend(dbg);
+        }
+        return;
+      } else {
+        var dbg2 = document.getElementById('harfaa-countdown-debug');
+        if(dbg2) dbg2.remove();
+      }
       var txt = formatCountdown(window.HARFAA_COUNTDOWN_END);
       if(!txt) return;
-      var el = findTimerEl();
+      var el = ensureTimerInjected();
       if(el){
-        unhideElAndParents(el);
+        el.style.display = 'block';
         el.textContent = txt;
-        // اظهر الاب اللي فيه "بيخلص بعد" كمان
         showByText(['بيخلص بعد','عرض الشتاء بيخلص']);
       }
     }, 1000);
@@ -180,11 +188,12 @@
     var cdEnabled = (S.countdown_enabled !== undefined) ? S.countdown_enabled : S.countdown_show;
     if(cdEnabled === false){
       hideByText(['بيخلص بعد','عرض الشتاء بيخلص','00 : 00 : 00']);
+      var inj = document.getElementById('harfaa-timer-injected');
+      if(inj) inj.style.setProperty('display','none','important');
     } else {
-      showByText(['بيخلص بعد','عرض الشتاء بيخلص','00 : 00 : 00']);
-      // اظهر التايمر نفسه حتى لو كان لوحده
-      var tEl = findTimerEl();
-      if(tEl) unhideElAndParents(tEl);
+      showByText(['بيخلص بعد','عرض الشتاء بيخلص']);
+      var inj2 = document.getElementById('harfaa-timer-injected');
+      if(inj2) inj2.style.removeProperty('display');
     }
     if(S.countdown_text){
       var ctEls = findAllByText(['بيخلص بعد','عرض الشتاء']);
@@ -195,12 +204,14 @@
       if(typeof S.countdown_end === 'string' && S.countdown_end.length === 10){
         window.HARFAA_COUNTDOWN_END = S.countdown_end + 'T23:59:59';
       }
-      // حدث التايمر فورا مش بعد ثانية
       var txtNow = formatCountdown(window.HARFAA_COUNTDOWN_END);
       if(txtNow){
-        var elNow = findTimerEl();
-        if(elNow){ unhideElAndParents(elNow); elNow.textContent = txtNow; }
+        var elNow = ensureTimerInjected();
+        if(elNow){ elNow.style.display='block'; elNow.textContent = txtNow; }
       }
+    } else {
+      // لو التاريخ فاضي، شيله عشان يبان البوكس الاصفر
+      window.HARFAA_COUNTDOWN_END = null;
     }
     var bundleEnabled = (S.bundle_enabled !== undefined) ? S.bundle_enabled : S.bundle_show;
     if(bundleEnabled === false){
