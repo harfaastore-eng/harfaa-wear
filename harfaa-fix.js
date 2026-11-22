@@ -1,5 +1,8 @@
-// Harfaa Fix V6 - Final Debug + Persistent Hide
+// Harfaa Fix V7 - FINAL: Ready - URL + Key Filled
 (function(){
+  var HARFAA_SB_URL = "https://uuxrjiytnnxsbhymkdfd.supabase.co";
+  var HARFAA_SB_KEY = "sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI";
+
   function parseSettings(row){
     if(!row) return null;
     for(var k in row){
@@ -13,7 +16,6 @@
   }
   function rgbToHex(r,g,b){return '#'+[r,g,b].map(n=>Math.max(0,Math.min(255,Math.round(n))).toString(16).padStart(2,'0')).join('');}
   function isLight(hex){let h=(hex||'#111').replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');let r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);return (0.299*r+0.587*g+0.114*b)/255>0.6;}
-
   function getColor(url,fallback,cb){
     if(!url) return cb(fallback);
     var cacheKey = 'harfaa_color_' + url;
@@ -31,54 +33,31 @@
     img.onerror=function(){ finish(fallback); };
     setTimeout(function(){ finish(fallback); },1500);
   }
-
-  // ===== دالة الاخفاء - بتدور في كل العناصر مش div بس =====
   function findAllByText(keywords){
     var found = [];
     var all = document.querySelectorAll('*');
     for(var i=0;i<all.length;i++){
       var el = all[i];
-      if(el.children.length > 2) continue; // خد العنصر الصغير بس
+      if(el.children.length > 2) continue;
       var t = (el.textContent||'').trim();
       if(t.length < 5 || t.length > 300) continue;
-      for(var k=0;k<keywords.length;k++){
-        if(t.includes(keywords[k])){ found.push(el); break; }
-      }
+      for(var k=0;k<keywords.length;k++){ if(t.includes(keywords[k])){ found.push(el); break; } }
     }
     return found;
   }
-
   function hideByText(keywords){
     var els = findAllByText(keywords);
     els.forEach(function(el){
       el.style.setProperty('display','none','important');
-      // اطلع لابوه واخفيه كمان لو هو البوكس الكبير
       var p = el.parentElement;
-      if(p && p.textContent.length < 400){
-        // اتاكد ان الاب مش body ولا الصفحة كلها
-        if(p.tagName !== 'BODY' && p.tagName !== 'HTML'){
-          p.style.setProperty('display','none','important');
-          var pp = p.parentElement;
-          if(pp && pp.textContent.length < 500 && pp.tagName !== 'BODY') pp.style.setProperty('display','none','important');
-        }
+      if(p && p.textContent.length < 400 && p.tagName !== 'BODY' && p.tagName !== 'HTML'){
+        p.style.setProperty('display','none','important');
+        var pp = p.parentElement;
+        if(pp && pp.textContent.length < 500 && pp.tagName !== 'BODY') pp.style.setProperty('display','none','important');
       }
     });
     return els.length;
   }
-
-  function showByText(keywords){
-    var els = findAllByText(keywords);
-    // لو مخفيين قبل كده بالـ display none، شيله
-    document.querySelectorAll('*').forEach(function(el){
-      var t = (el.textContent||'').trim();
-      for(var k=0;k<keywords.length;k++){
-        if(t.includes(keywords[k]) && el.style.display === 'none'){
-          el.style.removeProperty('display');
-        }
-      }
-    });
-  }
-
   function startCountdownTimer(){
     if(window._harfaaCountdownStarted) return;
     window._harfaaCountdownStarted = true;
@@ -102,19 +81,6 @@
       }
     }, 1000);
   }
-
-  // ===== Debug Box - عشان تشوف الموقع قرا ايه =====
-  function showDebug(S, rawRow){
-    var dbg = document.getElementById('harfaa-debug');
-    if(!dbg){
-      dbg = document.createElement('div');
-      dbg.id = 'harfaa-debug';
-      dbg.style.cssText = 'position:fixed;top:0;left:0;right:0;background:yellow;color:black;font-size:11px;padding:6px;z-index:99999;text-align:left;direction:ltr;white-space:pre-wrap';
-      document.body.prepend(dbg);
-    }
-    dbg.textContent = 'DEBUG HARFAA | countdown_enabled=' + S.countdown_enabled + ' | bundle_enabled=' + S.bundle_enabled + ' | banner_show=' + S.banner_show + ' | video_show=' + S.video_show + ' | rawKeys=' + Object.keys(rawRow||{}).join(',') + ' | free=' + (S.free_shipping||'');
-  }
-
   var lastApplied = null;
   function apply(S, rawRow){
     if(!S) return;
@@ -122,37 +88,22 @@
     window.HARFAA_SITE = S;
     window.HARFAA_RAW = rawRow;
     startCountdownTimer();
-    doApply(S, rawRow);
+    doApply(S);
+    var dbg = document.getElementById('harfaa-debug'); if(dbg) dbg.remove();
   }
-
-  function doApply(S, rawRow){
+  function doApply(S){
     if(!S) return;
-    showDebug(S, rawRow);
-
-    // --- البانر ---
     if(S.banner_show === false){
       hideByText(['HARFAA10','WINTER DROP']);
       var bb = document.getElementById('bannerBar'); if(bb) bb.style.setProperty('display','none','important');
-    } else {
-      if(S.banner){
-        // لو البانر موجود، غير نصه
-        var bEls = findAllByText(['HARFAA10','WINTER DROP']);
-        if(bEls.length && bEls[0]) bEls[0].textContent = S.banner;
-      }
     }
-
-    // --- العداد ---
     var cdEnabled = (S.countdown_enabled !== undefined) ? S.countdown_enabled : S.countdown_show;
-    if(cdEnabled === false){
-      hideByText(['بيخلص بعد','عرض الشتاء بيخلص','00 : 00 : 00']);
-    }
+    if(cdEnabled === false) hideByText(['بيخلص بعد','عرض الشتاء بيخلص','00 : 00 : 00']);
     if(S.countdown_text){
       var ctEls = findAllByText(['بيخلص بعد','عرض الشتاء']);
       if(ctEls.length) ctEls[0].textContent = S.countdown_text;
     }
     if(S.countdown_end) window.HARFAA_COUNTDOWN_END = S.countdown_end;
-
-    // --- البندل ---
     var bundleEnabled = (S.bundle_enabled !== undefined) ? S.bundle_enabled : S.bundle_show;
     if(bundleEnabled === false){
       hideByText(['عرض البندل','اشتري 2 وخد التالت','خد التالت بنص']);
@@ -161,8 +112,6 @@
       if(bnd.length) bnd[0].textContent = '🎁 ' + S.bundle_text;
     }
     if(S.bundle_type) window.HARFAA_BUNDLE_TYPE = S.bundle_type;
-
-    // --- الشحن المجاني ---
     var freeShip = S.free_shipping || S.freeShippingLimit || S.freeShipping;
     if(freeShip){
       window.HARFAA_FREE_SHIPPING = Number(freeShip);
@@ -172,12 +121,6 @@
         }
       });
     }
-
-    if(S.store_name || S.storeName){
-      var sName = S.store_name || S.storeName;
-      document.querySelectorAll('[data-setting="storeName"]').forEach(function(el){ el.textContent = sName; });
-    }
-
     var vb=document.querySelector('.videoBox');
     if(vb){
       if(S.video_show===false || !S.video_url){ vb.style.setProperty('display','none','important'); }
@@ -208,7 +151,6 @@
       });
     }
   }
-
   window.applyBundleDiscount = function(cartItems){
     var S = window.HARFAA_SITE || {};
     var enabled = (S.bundle_enabled !== undefined) ? S.bundle_enabled : S.bundle_show;
@@ -219,42 +161,56 @@
     if(S.bundle_type === 'third_30') return cheapest * 0.3;
     return cheapest * 0.5;
   };
-
+  var supabaseClient = null;
+  function getClient(){
+    if(supabaseClient) return supabaseClient;
+    if(window.sb) return window.sb;
+    if(window.supabaseClient) return window.supabaseClient;
+    var url = window._sbUrl || HARFAA_SB_URL;
+    var key = window._sbKey || HARFAA_SB_KEY;
+    if(window.supabase && url && key){
+      supabaseClient = window.supabase.createClient(url, key);
+      return supabaseClient;
+    }
+    return null;
+  }
+  function loadSupabaseLib(cb){
+    if(window.supabase){ cb(); return; }
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    s.onload = cb;
+    s.onerror = function(){
+      var dbg = document.getElementById('harfaa-debug');
+      if(!dbg){ dbg = document.createElement('div'); dbg.id='harfaa-debug'; dbg.style.cssText='position:fixed;top:0;left:0;right:0;background:red;color:white;font-size:12px;padding:8px;z-index:99999'; document.body.prepend(dbg); }
+      dbg.textContent = 'DEBUG: مش عارف احمل مكتبة Supabase - اتأكد من النت';
+    };
+    document.head.appendChild(s);
+  }
   async function fetchSettings(){
     try{
-      var client=window.sb || window.supabaseClient;
-      if(!client && window.supabase && window._sbUrl) client=window.supabase.createClient(window._sbUrl, window._sbKey);
+      var client = getClient();
       if(!client){
         var dbg = document.getElementById('harfaa-debug');
-        if(!dbg){
-          dbg = document.createElement('div'); dbg.id='harfaa-debug';
-          dbg.style.cssText='position:fixed;top:0;left:0;right:0;background:red;color:white;font-size:12px;padding:8px;z-index:99999';
-          dbg.textContent='DEBUG: مفيش Supabase Client - الموقع مش متوصل بـ Supabase اصلا';
-          document.body.prepend(dbg);
-        }
+        if(!dbg){ dbg = document.createElement('div'); dbg.id='harfaa-debug'; dbg.style.cssText='position:fixed;top:0;left:0;right:0;background:red;color:white;font-size:12px;padding:8px;z-index:99999'; document.body.prepend(dbg); }
+        dbg.textContent = 'DEBUG: لسه مفيش Supabase Client';
         return;
       }
       var res=await client.from('store_settings').select('*').limit(1).maybeSingle();
       if(res && res.data){ apply(parseSettings(res.data), res.data); return; }
+      if(res && res.error){
+        var dbg2 = document.getElementById('harfaa-debug');
+        if(!dbg2){ dbg2 = document.createElement('div'); dbg2.id='harfaa-debug'; dbg2.style.cssText='position:fixed;top:0;left:0;right:0;background:red;color:white;font-size:12px;padding:8px;z-index:99999'; document.body.prepend(dbg2); }
+        dbg2.textContent = 'DEBUG ERROR Supabase: ' + res.error.message;
+        return;
+      }
       var res2=await client.from('harfaa_settings').select('*').limit(1).maybeSingle();
       if(res2 && res2.data) apply(parseSettings(res2.data), res2.data);
     }catch(e){
-      var dbg2 = document.getElementById('harfaa-debug');
-      if(!dbg2){
-        dbg2 = document.createElement('div'); dbg2.id='harfaa-debug';
-        dbg2.style.cssText='position:fixed;top:0;left:0;right:0;background:red;color:white;font-size:12px;padding:8px;z-index:99999';
-        document.body.prepend(dbg2);
-      }
-      dbg2.textContent='DEBUG ERROR: '+(e.message||e);
+      var dbg3 = document.getElementById('harfaa-debug');
+      if(!dbg3){ dbg3 = document.createElement('div'); dbg3.id='harfaa-debug'; dbg3.style.cssText='position:fixed;top:0;left:0;right:0;background:red;color:white;font-size:12px;padding:8px;z-index:99999'; document.body.prepend(dbg3); }
+      dbg3.textContent='DEBUG ERROR: '+(e.message||e);
     }
   }
-
-  fetchSettings();
-  setTimeout(fetchSettings, 2000);
-  // اخفاء مستمر كل ثانية - عشان لو الـ HTML رجع يرسمهم تاني
-  setInterval(function(){
-    if(lastApplied) doApply(lastApplied, window.HARFAA_RAW);
-    if(document.hidden) return;
-    fetchSettings();
-  }, 1000);
+  loadSupabaseLib(function(){ fetchSettings(); setTimeout(fetchSettings, 2000); });
+  setInterval(function(){ if(lastApplied) doApply(lastApplied); if(document.hidden) return; fetchSettings(); }, 5000);
 })();
