@@ -1,4 +1,4 @@
-// Harfaa Fix V8 - Fix Show Again + Bundle Type Text
+// Harfaa Fix V9 - Countdown Timer Force Show
 (function(){
   var HARFAA_SB_URL = "https://uuxrjiytnnxsbhymkdfd.supabase.co";
   var HARFAA_SB_KEY = "sb_publishable_xDrhCsbKo4hMjERVkERgFQ_DtDjRKNI";
@@ -50,59 +50,110 @@
     els.forEach(function(el){
       el.style.setProperty('display','none','important');
       var p = el.parentElement;
-      if(p && p.textContent.length < 400 && p.tagName !== 'BODY' && p.tagName !== 'HTML'){
+      if(p && p.textContent.length < 500 && p.tagName !== 'BODY' && p.tagName !== 'HTML'){
         p.style.setProperty('display','none','important');
         var pp = p.parentElement;
-        if(pp && pp.textContent.length < 500 && pp.tagName !== 'BODY') pp.style.setProperty('display','none','important');
+        if(pp && pp.textContent.length < 600 && pp.tagName !== 'BODY') pp.style.setProperty('display','none','important');
       }
     });
     return els.length;
   }
-  // ===== دي اللي كانت ناقصة: اظهر تاني =====
+  // ===== اظهر + اظهر الاب والجد كمان - دي كانت المشكلة =====
+  function unhideElAndParents(el){
+    var cur = el;
+    for(var i=0;i<4 && cur && cur.tagName !== 'BODY' && cur.tagName !== 'HTML'; i++){
+      cur.style.removeProperty('display');
+      cur = cur.parentElement;
+    }
+  }
   function showByText(keywords){
     document.querySelectorAll('*').forEach(function(el){
       var t = (el.textContent||'').trim();
       for(var k=0;k<keywords.length;k++){
-        if(t.includes(keywords[k]) && el.style.display === 'none'){
-          el.style.removeProperty('display');
+        if(t.includes(keywords[k])){
+          unhideElAndParents(el);
         }
       }
     });
   }
   function getBundleText(type, customText){
-    // لو المستخدم كاتب نص مخصص ومفيهوش كلمة بنص او 30% او مجانا، استخدمه
     if(customText && !customText.includes('بنص') && !customText.includes('30%') && !customText.includes('مجانا') && !customText.includes('نص الثمن')){
       return customText;
     }
-    // غير كده، ولّد النص من النوع اللي اختاره في الادمن
     if(type === 'third_free') return 'عرض البندل: اشتري 2 وخد التالت مجانا!';
     if(type === 'third_30') return 'عرض البندل: اشتري 2 وخد التالت بخصم 30%!';
     if(type === 'third_half') return 'عرض البندل: اشتري 2 وخد التالت بنص الثمن!';
     return customText || 'عرض البندل: اشتري 2 وخد التالت بنص الثمن!';
   }
+
+  // ===== التايمر الجديد - بيدور بأي شكل =====
+  function findTimerEl(){
+    // 1. بالـ id او class
+    var byId = document.querySelector('#countdown, #timer, #countDown, .countdown, .timer, [id*="countdown" i], [class*="countdown" i], [id*="timer" i], [class*="timer" i]');
+    if(byId) return byId;
+    // 2. اي عنصر فيه شكل 00 : 00
+    var all = document.querySelectorAll('div,span,p,b,strong');
+    for(var i=0;i<all.length;i++){
+      var t = all[i].textContent||'';
+      if(/\d{1,2}\s*:\s*\d{2}\s*:\s*\d{2}/.test(t) && all[i].children.length === 0){
+        return all[i];
+      }
+    }
+    // 3. العنصر اللي جنب "بيخلص بعد" - اخوه اللي بعده
+    var label = null;
+    var all2 = document.querySelectorAll('*');
+    for(var j=0;j<all2.length;j++){
+      if((all2[j].textContent||'').includes('بيخلص بعد') && all2[j].children.length === 0){ label = all2[j]; break; }
+    }
+    if(label){
+      // دور على اخوه او ابوه فيه رقم
+      var parent = label.parentElement;
+      if(parent){
+        var spans = parent.querySelectorAll('span,div,b');
+        for(var k=0;k<spans.length;k++){
+          if(spans[k] !== label) return spans[k];
+        }
+        // لو مفيش، اعمل عنصر تايمر جديد جنبه
+        var newEl = document.createElement('div');
+        newEl.id = 'harfaa-timer-new';
+        newEl.style.cssText = 'font-weight:800;font-size:18px;text-align:center;margin-top:4px;direction:ltr';
+        newEl.textContent = '00 : 00 : 00 : 00';
+        parent.appendChild(newEl);
+        return newEl;
+      }
+    }
+    return null;
+  }
+  function formatCountdown(end){
+    var diff = new Date(end).getTime() - Date.now();
+    if(isNaN(diff)) return null;
+    if(diff <= 0) return "00 : 00 : 00 : 00";
+    var d = Math.floor(diff / 86400000);
+    var h = Math.floor((diff % 86400000) / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    return String(d).padStart(2,'0') + ' : ' + String(h).padStart(2,'0') + ' : ' + String(m).padStart(2,'0') + ' : ' + String(s).padStart(2,'0');
+  }
   function startCountdownTimer(){
     if(window._harfaaCountdownStarted) return;
     window._harfaaCountdownStarted = true;
     setInterval(function(){
-      var els = document.querySelectorAll('div,span,p');
-      for(var i=0;i<els.length;i++){
-        var t = els[i].textContent||'';
-        if(/^\s*\d{2} : \d{2} : \d{2} : \d{2}\s*$/.test(t)){
-          if(!window.HARFAA_COUNTDOWN_END) return;
-          var end = new Date(window.HARFAA_COUNTDOWN_END).getTime();
-          if(isNaN(end)) return;
-          var diff = end - Date.now();
-          if(diff <= 0){ els[i].textContent = "00 : 00 : 00 : 00"; return; }
-          var d = Math.floor(diff / 86400000);
-          var h = Math.floor((diff % 86400000) / 3600000);
-          var m = Math.floor((diff % 3600000) / 60000);
-          var s = Math.floor((diff % 60000) / 1000);
-          els[i].textContent = String(d).padStart(2,'0') + ' : ' + String(h).padStart(2,'0') + ' : ' + String(m).padStart(2,'0') + ' : ' + String(s).padStart(2,'0');
-          return;
-        }
+      if(!window.HARFAA_COUNTDOWN_END) return;
+      var S = window.HARFAA_SITE || {};
+      var cdEnabled = (S.countdown_enabled !== undefined) ? S.countdown_enabled : S.countdown_show;
+      if(cdEnabled === false) return;
+      var txt = formatCountdown(window.HARFAA_COUNTDOWN_END);
+      if(!txt) return;
+      var el = findTimerEl();
+      if(el){
+        unhideElAndParents(el);
+        el.textContent = txt;
+        // اظهر الاب اللي فيه "بيخلص بعد" كمان
+        showByText(['بيخلص بعد','عرض الشتاء بيخلص']);
       }
     }, 1000);
   }
+
   var lastApplied = null;
   function apply(S, rawRow){
     if(!S) return;
@@ -115,7 +166,6 @@
   }
   function doApply(S){
     if(!S) return;
-    // البانر
     if(S.banner_show === false){
       hideByText(['HARFAA10','WINTER DROP']);
       var bb = document.getElementById('bannerBar'); if(bb) bb.style.setProperty('display','none','important');
@@ -127,17 +177,14 @@
         if(bEls.length) bEls[0].textContent = S.banner;
       }
     }
-
-    // ===== العداد - اظهر تاني لو متفعل =====
     var cdEnabled = (S.countdown_enabled !== undefined) ? S.countdown_enabled : S.countdown_show;
     if(cdEnabled === false){
       hideByText(['بيخلص بعد','عرض الشتاء بيخلص','00 : 00 : 00']);
     } else {
       showByText(['بيخلص بعد','عرض الشتاء بيخلص','00 : 00 : 00']);
-      // لو العداد كان مخفي والاب مخفي، اظهر الاب كمان
-      document.querySelectorAll('*').forEach(function(el){
-        if((el.textContent||'').includes('بيخلص بعد') && el.style.display === 'none') el.style.removeProperty('display');
-      });
+      // اظهر التايمر نفسه حتى لو كان لوحده
+      var tEl = findTimerEl();
+      if(tEl) unhideElAndParents(tEl);
     }
     if(S.countdown_text){
       var ctEls = findAllByText(['بيخلص بعد','عرض الشتاء']);
@@ -145,13 +192,16 @@
     }
     if(S.countdown_end){
       window.HARFAA_COUNTDOWN_END = S.countdown_end;
-      // لو التاريخ من غير وقت، خليه اخر اليوم
       if(typeof S.countdown_end === 'string' && S.countdown_end.length === 10){
         window.HARFAA_COUNTDOWN_END = S.countdown_end + 'T23:59:59';
       }
+      // حدث التايمر فورا مش بعد ثانية
+      var txtNow = formatCountdown(window.HARFAA_COUNTDOWN_END);
+      if(txtNow){
+        var elNow = findTimerEl();
+        if(elNow){ unhideElAndParents(elNow); elNow.textContent = txtNow; }
+      }
     }
-
-    // ===== البندل - اظهر + غير النص على حسب النوع =====
     var bundleEnabled = (S.bundle_enabled !== undefined) ? S.bundle_enabled : S.bundle_show;
     if(bundleEnabled === false){
       hideByText(['عرض البندل','اشتري 2 وخد التالت','خد التالت بنص']);
@@ -160,7 +210,6 @@
       var finalBundleText = getBundleText(S.bundle_type, S.bundle_text);
       var bnd = findAllByText(['عرض البندل','اشتري 2 وخد']);
       if(bnd.length) bnd[0].textContent = '🎁 ' + finalBundleText;
-      // لو النص القديم لسه موجود في عنصر تاني، غيره برضه
       document.querySelectorAll('*').forEach(function(el){
         if(el.children.length === 0 && (el.textContent||'').includes('بنص الثمن') && S.bundle_type === 'third_30'){
           el.textContent = (el.textContent||'').replace('بنص الثمن','بخصم 30%').replace('نص الثمن','خصم 30%');
@@ -168,13 +217,9 @@
         if(el.children.length === 0 && (el.textContent||'').includes('بخصم 30%') && S.bundle_type === 'third_half'){
           el.textContent = (el.textContent||'').replace('بخصم 30%','بنص الثمن');
         }
-        if(el.children.length === 0 && (el.textContent||'').includes('مجانا') && S.bundle_type === 'third_30'){
-          el.textContent = (el.textContent||'').replace('مجانا','بخصم 30%');
-        }
       });
     }
     if(S.bundle_type) window.HARFAA_BUNDLE_TYPE = S.bundle_type;
-
     var freeShip = S.free_shipping || S.freeShippingLimit || S.freeShipping;
     if(freeShip){
       window.HARFAA_FREE_SHIPPING = Number(freeShip);
@@ -242,11 +287,6 @@
     var s = document.createElement('script');
     s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
     s.onload = cb;
-    s.onerror = function(){
-      var dbg = document.getElementById('harfaa-debug');
-      if(!dbg){ dbg = document.createElement('div'); dbg.id='harfaa-debug'; dbg.style.cssText='position:fixed;top:0;left:0;right:0;background:red;color:white;font-size:12px;padding:8px;z-index:99999'; document.body.prepend(dbg); }
-      dbg.textContent = 'DEBUG: مش عارف احمل مكتبة Supabase - اتأكد من النت';
-    };
     document.head.appendChild(s);
   }
   async function fetchSettings(){
